@@ -2,24 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inicio de Sesión - Laboratorio de Microcontroladores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
+        body { background-color: #f8f9fa; padding-bottom: 60px; }
         .navbar-custom { background-color: #6a1b29; color: white; } /* Guinda IPN */
-        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
-        .card-login { margin-top: 5vh; border-top: 5px solid #6a1b29; }
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+        .card-login { margin-top: 5vh; border-top: 5px solid #6a1b29; width: 100%; max-width: 420px; }
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: 1rem !important; white-space: normal !important; }
+            .card-login { margin-top: 3vh; padding: 1.5rem 1.25rem !important; }
+            input.form-control, .btn { font-size: 16px !important; padding: 0.65rem 0.9rem !important; }
+        }
     </style>
 </head>
 <body>
     {% include "shared/brand_logos.html" %}
     <!-- Encabezado Institucional (REQ-8.4.2) -->
-    <nav class="navbar navbar-custom px-4 py-2">
+    <nav class="navbar navbar-custom px-3 px-md-4 py-2">
         <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán - Sistema de Préstamos</span>
     </nav>
 
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
-        <div class="card card-login shadow p-4" style="width: 400px;">
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="card card-login shadow p-4">
             <h3 class="text-center mb-4" style="color: #6a1b29;">Iniciar Sesión</h3>
             
             {% if request.GET.inactividad == '1' %}
