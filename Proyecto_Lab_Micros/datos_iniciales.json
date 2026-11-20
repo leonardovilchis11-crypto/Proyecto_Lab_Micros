@@ -1,0 +1,1446 @@
+[
+{
+  "model": "inventario.categoria",
+  "pk": 1,
+  "fields": {
+    "nombre": "Microcontroladores"
+  }
+},
+{
+  "model": "inventario.categoria",
+  "pk": 2,
+  "fields": {
+    "nombre": "Instrumentos de Medición"
+  }
+},
+{
+  "model": "inventario.categoria",
+  "pk": 3,
+  "fields": {
+    "nombre": "Fuentes de Poder"
+  }
+},
+{
+  "model": "inventario.categoria",
+  "pk": 4,
+  "fields": {
+    "nombre": "Cables y Puntas de Prueba"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 1,
+  "fields": {
+    "estante": "Estante A",
+    "cajon": "Cajón 1"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 2,
+  "fields": {
+    "estante": "Estante A",
+    "cajon": "Cajón 2"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 3,
+  "fields": {
+    "estante": "Estante A",
+    "cajon": "Cajón 3"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 4,
+  "fields": {
+    "estante": "Estante A",
+    "cajon": "Cajón 4"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 5,
+  "fields": {
+    "estante": "Estante A",
+    "cajon": "Cajón 5"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 6,
+  "fields": {
+    "estante": "Estante B",
+    "cajon": "Cajón 1"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 7,
+  "fields": {
+    "estante": "Estante B",
+    "cajon": "Cajón 2"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 8,
+  "fields": {
+    "estante": "Estante B",
+    "cajon": "Cajón 3"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 9,
+  "fields": {
+    "estante": "Estante B",
+    "cajon": "Cajón 4"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 10,
+  "fields": {
+    "estante": "Estante B",
+    "cajon": "Cajón 5"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 11,
+  "fields": {
+    "estante": "Estante C",
+    "cajon": "Cajón 1"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 12,
+  "fields": {
+    "estante": "Estante C",
+    "cajon": "Cajón 2"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 13,
+  "fields": {
+    "estante": "Estante C",
+    "cajon": "Cajón 3"
+  }
+},
+{
+  "model": "inventario.ubicacion",
+  "pk": 14,
+  "fields": {
+    "estante": "Estante C",
+    "cajon": "Cajón 4"
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 1,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 1,
+    "codigo_barras": "MIC-ESP32-001",
+    "nombre": "Tarjeta de Desarrollo ESP32 NodeMCU",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "SoC Xtensa Dual-Core 32-bit LX6, Wi-Fi/BLE, 38 pines GPIO, incluye cable Micro-USB.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 2,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 1,
+    "codigo_barras": "MIC-ESP32-002",
+    "nombre": "Tarjeta de Desarrollo ESP32 NodeMCU",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "SoC Xtensa Dual-Core 32-bit LX6, Wi-Fi/BLE, 38 pines GPIO, incluye cable Micro-USB.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 3,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 1,
+    "codigo_barras": "MIC-ESP32-003",
+    "nombre": "Tarjeta de Desarrollo ESP32 NodeMCU",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "SoC Xtensa Dual-Core 32-bit LX6, Wi-Fi/BLE, 38 pines GPIO, incluye cable Micro-USB.",
+    "estado": "PRESTADO",
+    "observaciones": "En préstamo activo",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 4,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 2,
+    "codigo_barras": "MIC-PIC16-001",
+    "nombre": "Kit Microcontrolador PIC16F887 + Grabador PICkit 3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 8 bits DIP-40, 20 MHz, incluye programador/depurador ICSP USB y base ZIF.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 5,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 2,
+    "codigo_barras": "MIC-PIC16-002",
+    "nombre": "Kit Microcontrolador PIC16F887 + Grabador PICkit 3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 8 bits DIP-40, 20 MHz, incluye programador/depurador ICSP USB y base ZIF.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 6,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 2,
+    "codigo_barras": "MIC-PIC16-003",
+    "nombre": "Kit Microcontrolador PIC16F887 + Grabador PICkit 3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 8 bits DIP-40, 20 MHz, incluye programador/depurador ICSP USB y base ZIF.",
+    "estado": "MANTENIMIENTO",
+    "observaciones": "Revisión de zócalo ZIF con falso contacto.",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 7,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 3,
+    "codigo_barras": "MIC-MEGA-001",
+    "nombre": "Arduino Mega 2560 Rev3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "ATmega2560 16MHz, 54 pines digitales I/O, 16 entradas analógicas, 4 UARTs.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 8,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 3,
+    "codigo_barras": "MIC-MEGA-002",
+    "nombre": "Arduino Mega 2560 Rev3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "ATmega2560 16MHz, 54 pines digitales I/O, 16 entradas analógicas, 4 UARTs.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 9,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 4,
+    "codigo_barras": "MIC-STM32-001",
+    "nombre": "Tarjeta ARM Cortex-M4 STM32F401RE Nucleo-64",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 32-bit 84 MHz, 512 KB Flash, depurador ST-LINK/V2-1 integrado.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 10,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 4,
+    "codigo_barras": "MIC-STM32-002",
+    "nombre": "Tarjeta ARM Cortex-M4 STM32F401RE Nucleo-64",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 32-bit 84 MHz, 512 KB Flash, depurador ST-LINK/V2-1 integrado.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 11,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 5,
+    "codigo_barras": "MIC-8086-001",
+    "nombre": "Entrenador de Microprocesador Intel 8086 / 8088",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Tablero didáctico con teclado hexadecimal, display 7 segmentos y puertos PPI 8255.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 12,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 5,
+    "codigo_barras": "MIC-8086-002",
+    "nombre": "Entrenador de Microprocesador Intel 8086 / 8088",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Tablero didáctico con teclado hexadecimal, display 7 segmentos y puertos PPI 8255.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 13,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 6,
+    "codigo_barras": "INS-OSC-001",
+    "nombre": "Osciloscopio Digital Tektronix TBS1102B 100MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales analógicos, muestreo 2 GS/s, pantalla LCD 7 pulgadas, análisis FFT.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 14,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 6,
+    "codigo_barras": "INS-OSC-002",
+    "nombre": "Osciloscopio Digital Tektronix TBS1102B 100MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales analógicos, muestreo 2 GS/s, pantalla LCD 7 pulgadas, análisis FFT.",
+    "estado": "MANTENIMIENTO",
+    "observaciones": "Calibración de canal CH2 pendiente.",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 15,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 6,
+    "codigo_barras": "INS-OSC-003",
+    "nombre": "Osciloscopio Digital Tektronix TBS1102B 100MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales analógicos, muestreo 2 GS/s, pantalla LCD 7 pulgadas, análisis FFT.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 16,
+  "fields": {
+    "categoria": 3,
+    "ubicacion": 7,
+    "codigo_barras": "INS-FUE-001",
+    "nombre": "Fuente de Alimentación DC Regulada Triple Salida (0-30V / 5A)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 salidas variables 0-30V 5A + 1 salida fija 5V 3A para lógica TTL/CMOS, protección contra cortocircuito.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 17,
+  "fields": {
+    "categoria": 3,
+    "ubicacion": 7,
+    "codigo_barras": "INS-FUE-002",
+    "nombre": "Fuente de Alimentación DC Regulada Triple Salida (0-30V / 5A)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 salidas variables 0-30V 5A + 1 salida fija 5V 3A para lógica TTL/CMOS, protección contra cortocircuito.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 18,
+  "fields": {
+    "categoria": 3,
+    "ubicacion": 7,
+    "codigo_barras": "INS-FUE-003",
+    "nombre": "Fuente de Alimentación DC Regulada Triple Salida (0-30V / 5A)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 salidas variables 0-30V 5A + 1 salida fija 5V 3A para lógica TTL/CMOS, protección contra cortocircuito.",
+    "estado": "PRESTADO",
+    "observaciones": "Prestado en mesa 4",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 19,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 8,
+    "codigo_barras": "INS-GEN-001",
+    "nombre": "Generador de Funciones Arbitrarias Rigol DG1022Z 25MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales de salida, señales senoidal, cuadrada (reloj), rampa, pulso y ruido.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 20,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 8,
+    "codigo_barras": "INS-GEN-002",
+    "nombre": "Generador de Funciones Arbitrarias Rigol DG1022Z 25MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales de salida, señales senoidal, cuadrada (reloj), rampa, pulso y ruido.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 21,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 9,
+    "codigo_barras": "INS-MUL-001",
+    "nombre": "Multímetro Digital True-RMS Fluke 115",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Medición de voltaje AC/DC 600V, corriente 10A, continuidad audible, frecuencia y capacitancia.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 22,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 9,
+    "codigo_barras": "INS-MUL-002",
+    "nombre": "Multímetro Digital True-RMS Fluke 115",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Medición de voltaje AC/DC 600V, corriente 10A, continuidad audible, frecuencia y capacitancia.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 23,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 9,
+    "codigo_barras": "INS-MUL-003",
+    "nombre": "Multímetro Digital True-RMS Fluke 115",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Medición de voltaje AC/DC 600V, corriente 10A, continuidad audible, frecuencia y capacitancia.",
+    "estado": "DANADO",
+    "observaciones": "Fusible interno de 10A quemado en práctica.",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 24,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 10,
+    "codigo_barras": "INS-ANA-001",
+    "nombre": "Analizador Lógico USB de 8 Canales 24MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Decodificación de protocolos I2C, SPI, UART, 1-Wire y CAN para depuración de microprocesadores.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 25,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 11,
+    "codigo_barras": "CAB-OSC-001",
+    "nombre": "Punta de Prueba Atenuada para Osciloscopio BNC (1x/10x)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Ancho de banda 100MHz, conector BNC macho con gancho retráctil y caimán de tierra.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 26,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 11,
+    "codigo_barras": "CAB-OSC-002",
+    "nombre": "Punta de Prueba Atenuada para Osciloscopio BNC (1x/10x)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Ancho de banda 100MHz, conector BNC macho con gancho retráctil y caimán de tierra.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 27,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 11,
+    "codigo_barras": "CAB-OSC-003",
+    "nombre": "Punta de Prueba Atenuada para Osciloscopio BNC (1x/10x)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Ancho de banda 100MHz, conector BNC macho con gancho retráctil y caimán de tierra.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 28,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 12,
+    "codigo_barras": "CAB-BNC-001",
+    "nombre": "Cable Coaxial BNC a Caimán-Caimán (Generador / Osciloscopio)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Impedancia 50 Ohms, 1 metro de longitud, terminales caimán rojo (señal) y negro (GND).",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 29,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 12,
+    "codigo_barras": "CAB-BNC-002",
+    "nombre": "Cable Coaxial BNC a Caimán-Caimán (Generador / Osciloscopio)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Impedancia 50 Ohms, 1 metro de longitud, terminales caimán rojo (señal) y negro (GND).",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 30,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 13,
+    "codigo_barras": "CAB-CAI-001",
+    "nombre": "Juego de 10 Cables Caimán-Caimán Multicolor (50 cm)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Pinzas caimán aisladas de 35mm para interconexión rápida de circuitos y alimentación.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 31,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 13,
+    "codigo_barras": "CAB-CAI-002",
+    "nombre": "Juego de 10 Cables Caimán-Caimán Multicolor (50 cm)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Pinzas caimán aisladas de 35mm para interconexión rápida de circuitos y alimentación.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 32,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 14,
+    "codigo_barras": "CAB-BAN-001",
+    "nombre": "Par de Cables Banana a Caimán para Fuente de Alimentación",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Calibre 18 AWG siliconado, soporta hasta 10A para alimentar protoboards desde fuente DC.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 33,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 14,
+    "codigo_barras": "CAB-BAN-002",
+    "nombre": "Par de Cables Banana a Caimán para Fuente de Alimentación",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Calibre 18 AWG siliconado, soporta hasta 10A para alimentar protoboards desde fuente DC.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 34,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 1,
+    "codigo_barras": "MIC-ESP32-004",
+    "nombre": "Tarjeta de Desarrollo ESP32 NodeMCU",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "SoC Xtensa Dual-Core 32-bit LX6, Wi-Fi/BLE, 38 pines GPIO, incluye cable Micro-USB.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 35,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 1,
+    "codigo_barras": "MIC-ESP32-005",
+    "nombre": "Tarjeta de Desarrollo ESP32 NodeMCU",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "SoC Xtensa Dual-Core 32-bit LX6, Wi-Fi/BLE, 38 pines GPIO, incluye cable Micro-USB.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 36,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 2,
+    "codigo_barras": "MIC-PIC16-004",
+    "nombre": "Kit Microcontrolador PIC16F887 + Grabador PICkit 3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 8 bits DIP-40, 20 MHz, incluye programador/depurador ICSP USB y base ZIF.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 37,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 2,
+    "codigo_barras": "MIC-PIC16-005",
+    "nombre": "Kit Microcontrolador PIC16F887 + Grabador PICkit 3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 8 bits DIP-40, 20 MHz, incluye programador/depurador ICSP USB y base ZIF.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 38,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 3,
+    "codigo_barras": "MIC-MEGA-003",
+    "nombre": "Arduino Mega 2560 Rev3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "ATmega2560 16MHz, 54 pines digitales I/O, 16 entradas analógicas, 4 UARTs.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 39,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 3,
+    "codigo_barras": "MIC-MEGA-004",
+    "nombre": "Arduino Mega 2560 Rev3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "ATmega2560 16MHz, 54 pines digitales I/O, 16 entradas analógicas, 4 UARTs.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 40,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 3,
+    "codigo_barras": "MIC-MEGA-005",
+    "nombre": "Arduino Mega 2560 Rev3",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "ATmega2560 16MHz, 54 pines digitales I/O, 16 entradas analógicas, 4 UARTs.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 41,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 4,
+    "codigo_barras": "MIC-STM32-003",
+    "nombre": "Tarjeta ARM Cortex-M4 STM32F401RE Nucleo-64",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 32-bit 84 MHz, 512 KB Flash, depurador ST-LINK/V2-1 integrado.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 42,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 4,
+    "codigo_barras": "MIC-STM32-004",
+    "nombre": "Tarjeta ARM Cortex-M4 STM32F401RE Nucleo-64",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 32-bit 84 MHz, 512 KB Flash, depurador ST-LINK/V2-1 integrado.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 43,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 4,
+    "codigo_barras": "MIC-STM32-005",
+    "nombre": "Tarjeta ARM Cortex-M4 STM32F401RE Nucleo-64",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "MCU 32-bit 84 MHz, 512 KB Flash, depurador ST-LINK/V2-1 integrado.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 44,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 5,
+    "codigo_barras": "MIC-8086-003",
+    "nombre": "Entrenador de Microprocesador Intel 8086 / 8088",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Tablero didáctico con teclado hexadecimal, display 7 segmentos y puertos PPI 8255.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 45,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 5,
+    "codigo_barras": "MIC-8086-004",
+    "nombre": "Entrenador de Microprocesador Intel 8086 / 8088",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Tablero didáctico con teclado hexadecimal, display 7 segmentos y puertos PPI 8255.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 46,
+  "fields": {
+    "categoria": 1,
+    "ubicacion": 5,
+    "codigo_barras": "MIC-8086-005",
+    "nombre": "Entrenador de Microprocesador Intel 8086 / 8088",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Tablero didáctico con teclado hexadecimal, display 7 segmentos y puertos PPI 8255.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 47,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 6,
+    "codigo_barras": "INS-OSC-004",
+    "nombre": "Osciloscopio Digital Tektronix TBS1102B 100MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales analógicos, muestreo 2 GS/s, pantalla LCD 7 pulgadas, análisis FFT.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 48,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 6,
+    "codigo_barras": "INS-OSC-005",
+    "nombre": "Osciloscopio Digital Tektronix TBS1102B 100MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales analógicos, muestreo 2 GS/s, pantalla LCD 7 pulgadas, análisis FFT.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 49,
+  "fields": {
+    "categoria": 3,
+    "ubicacion": 7,
+    "codigo_barras": "INS-FUE-004",
+    "nombre": "Fuente de Alimentación DC Regulada Triple Salida (0-30V / 5A)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 salidas variables 0-30V 5A + 1 salida fija 5V 3A para lógica TTL/CMOS, protección contra cortocircuito.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 50,
+  "fields": {
+    "categoria": 3,
+    "ubicacion": 7,
+    "codigo_barras": "INS-FUE-005",
+    "nombre": "Fuente de Alimentación DC Regulada Triple Salida (0-30V / 5A)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 salidas variables 0-30V 5A + 1 salida fija 5V 3A para lógica TTL/CMOS, protección contra cortocircuito.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 51,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 8,
+    "codigo_barras": "INS-GEN-003",
+    "nombre": "Generador de Funciones Arbitrarias Rigol DG1022Z 25MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales de salida, señales senoidal, cuadrada (reloj), rampa, pulso y ruido.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 52,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 8,
+    "codigo_barras": "INS-GEN-004",
+    "nombre": "Generador de Funciones Arbitrarias Rigol DG1022Z 25MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales de salida, señales senoidal, cuadrada (reloj), rampa, pulso y ruido.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 53,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 8,
+    "codigo_barras": "INS-GEN-005",
+    "nombre": "Generador de Funciones Arbitrarias Rigol DG1022Z 25MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "2 canales de salida, señales senoidal, cuadrada (reloj), rampa, pulso y ruido.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 54,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 9,
+    "codigo_barras": "INS-MUL-004",
+    "nombre": "Multímetro Digital True-RMS Fluke 115",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Medición de voltaje AC/DC 600V, corriente 10A, continuidad audible, frecuencia y capacitancia.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 55,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 9,
+    "codigo_barras": "INS-MUL-005",
+    "nombre": "Multímetro Digital True-RMS Fluke 115",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Medición de voltaje AC/DC 600V, corriente 10A, continuidad audible, frecuencia y capacitancia.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 56,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 10,
+    "codigo_barras": "INS-ANA-002",
+    "nombre": "Analizador Lógico USB de 8 Canales 24MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Decodificación de protocolos I2C, SPI, UART, 1-Wire y CAN para depuración de microprocesadores.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 57,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 10,
+    "codigo_barras": "INS-ANA-003",
+    "nombre": "Analizador Lógico USB de 8 Canales 24MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Decodificación de protocolos I2C, SPI, UART, 1-Wire y CAN para depuración de microprocesadores.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 58,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 10,
+    "codigo_barras": "INS-ANA-004",
+    "nombre": "Analizador Lógico USB de 8 Canales 24MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Decodificación de protocolos I2C, SPI, UART, 1-Wire y CAN para depuración de microprocesadores.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 59,
+  "fields": {
+    "categoria": 2,
+    "ubicacion": 10,
+    "codigo_barras": "INS-ANA-005",
+    "nombre": "Analizador Lógico USB de 8 Canales 24MHz",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Decodificación de protocolos I2C, SPI, UART, 1-Wire y CAN para depuración de microprocesadores.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 60,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 11,
+    "codigo_barras": "CAB-OSC-004",
+    "nombre": "Punta de Prueba Atenuada para Osciloscopio BNC (1x/10x)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Ancho de banda 100MHz, conector BNC macho con gancho retráctil y caimán de tierra.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 61,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 11,
+    "codigo_barras": "CAB-OSC-005",
+    "nombre": "Punta de Prueba Atenuada para Osciloscopio BNC (1x/10x)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Ancho de banda 100MHz, conector BNC macho con gancho retráctil y caimán de tierra.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 62,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 12,
+    "codigo_barras": "CAB-BNC-003",
+    "nombre": "Cable Coaxial BNC a Caimán-Caimán (Generador / Osciloscopio)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Impedancia 50 Ohms, 1 metro de longitud, terminales caimán rojo (señal) y negro (GND).",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 63,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 12,
+    "codigo_barras": "CAB-BNC-004",
+    "nombre": "Cable Coaxial BNC a Caimán-Caimán (Generador / Osciloscopio)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Impedancia 50 Ohms, 1 metro de longitud, terminales caimán rojo (señal) y negro (GND).",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 64,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 12,
+    "codigo_barras": "CAB-BNC-005",
+    "nombre": "Cable Coaxial BNC a Caimán-Caimán (Generador / Osciloscopio)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Impedancia 50 Ohms, 1 metro de longitud, terminales caimán rojo (señal) y negro (GND).",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 65,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 13,
+    "codigo_barras": "CAB-CAI-003",
+    "nombre": "Juego de 10 Cables Caimán-Caimán Multicolor (50 cm)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Pinzas caimán aisladas de 35mm para interconexión rápida de circuitos y alimentación.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 66,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 13,
+    "codigo_barras": "CAB-CAI-004",
+    "nombre": "Juego de 10 Cables Caimán-Caimán Multicolor (50 cm)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Pinzas caimán aisladas de 35mm para interconexión rápida de circuitos y alimentación.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 67,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 13,
+    "codigo_barras": "CAB-CAI-005",
+    "nombre": "Juego de 10 Cables Caimán-Caimán Multicolor (50 cm)",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Pinzas caimán aisladas de 35mm para interconexión rápida de circuitos y alimentación.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 68,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 14,
+    "codigo_barras": "CAB-BAN-003",
+    "nombre": "Par de Cables Banana a Caimán para Fuente de Alimentación",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Calibre 18 AWG siliconado, soporta hasta 10A para alimentar protoboards desde fuente DC.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 69,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 14,
+    "codigo_barras": "CAB-BAN-004",
+    "nombre": "Par de Cables Banana a Caimán para Fuente de Alimentación",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Calibre 18 AWG siliconado, soporta hasta 10A para alimentar protoboards desde fuente DC.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "inventario.material",
+  "pk": 70,
+  "fields": {
+    "categoria": 4,
+    "ubicacion": 14,
+    "codigo_barras": "CAB-BAN-005",
+    "nombre": "Par de Cables Banana a Caimán para Fuente de Alimentación",
+    "marca": "",
+    "modelo": "",
+    "numero_serie": "",
+    "descripcion": "Calibre 18 AWG siliconado, soporta hasta 10A para alimentar protoboards desde fuente DC.",
+    "estado": "DISPONIBLE",
+    "observaciones": "",
+    "motivo_baja": "",
+    "imagen": ""
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$CKf1q7yBUtTfAUERP0SGE9$RBN7Y5McykTV5SQZDHMHDw0oNsI888o5fIcVGWKb+mU=",
+    "last_login": "2026-11-19T05:28:13.952Z",
+    "is_superuser": true,
+    "username": "saul",
+    "first_name": "cardenas",
+    "last_name": "sanchez",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-11-19T05:05:44.950Z",
+    "boleta_credencial": "2023350311",
+    "correo_institucional": "scardenass@alumno.ipn.mx",
+    "rol": "ALUMNO",
+    "estatus": "ACTIVO",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$yebFWRB5NUzz4mEnaS3LAI$RJ+9Zowm9AzyEC0zv0f621+2qkw9M9xVi2fDwrNU3uE=",
+    "last_login": "2026-11-19T05:42:44.550Z",
+    "is_superuser": true,
+    "username": "ADMIN001",
+    "first_name": "Admin",
+    "last_name": "ESIME",
+    "email": "admin@ipn.mx",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-11-19T05:32:22.207Z",
+    "boleta_credencial": "ADMIN001",
+    "correo_institucional": "admin@ipn.mx",
+    "rol": "ADMINISTRADOR",
+    "estatus": "ACTIVO",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

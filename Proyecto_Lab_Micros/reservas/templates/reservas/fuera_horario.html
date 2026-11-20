@@ -1,0 +1,32 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Servicio Fuera de Horario | ESIME Culhuacán{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 text-center p-4">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="badge rounded-pill px-3 py-2 text-white" style="background-color: var(--ipn-guinda);">
+                        Aviso de Disponibilidad Operativa
+                    </span>
+                </div>
+                <h2 class="h4 fw-bold mb-3" style="color: var(--ipn-guinda);">
+                    {{ mensaje_restriccion }}
+                </h2>
+                <p class="text-muted mb-3">
+                    Los módulos de reservación y carrito de solicitudes permanecen bloqueados durante sábados y domingos.
+                </p>
+                <div class="alert alert-light border mb-4">
+                    <div class="small text-muted">Siguiente día hábil de atención:</div>
+                    <div class="fw-bold fs-6">{{ siguiente_dia_texto }} (a partir de las 07:00 hrs)</div>
+                </div>
+                <a href="{% url 'catalogo:lista' %}" class="btn btn-guinda px-4 py-2">
+                    Volver al catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Bandeja de Solicitudes y Reservas | Ventanilla ESIME{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="h4 fw-bold mb-1" style="color: var(--ipn-guinda);">Bandeja de Solicitudes y Reservas (Ventanilla)</h2>
+        <p class="text-muted mb-0">Consulta las reservas pendientes enviadas por los alumnos para atención o cancelación.</p>
+    </div>
+    <span class="badge bg-dark fs-6">Total registros: {{ total_registros }}</span>
+</div>
+
+<!-- Barra de búsqueda y filtros (Req. 3.0.3) -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="filtro_q" class="form-label small fw-semibold">Buscar por alumno o boleta</label>
+                <input type="text" id="filtro_q" name="q" value="{{ query }}" class="form-control" placeholder="Ej. Carlos Mendoza o 2023301452">
+            </div>
+            <div class="col-md-3">
+                <label for="filtro_estatus" class="form-label small fw-semibold">Estatus</label>
+                <select id="filtro_estatus" name="estatus" class="form-select">
+                    <option value="">Todos los estatus</option>
+                    <option value="CONFIRMADA" {% if estatus_sel == "CONFIRMADA" %}selected{% endif %}>Confirmada</option>
+                    <option value="SIN_CONFIRMAR" {% if estatus_sel == "SIN_CONFIRMAR" %}selected{% endif %}>Sin confirmar</option>
+                    <option value="ATENDIDA" {% if estatus_sel == "ATENDIDA" %}selected{% endif %}>Atendida</option>
+                    <option value="CANCELADA" {% if estatus_sel == "CANCELADA" %}selected{% endif %}>Cancelada</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="filtro_fecha" class="form-label small fw-semibold">Fecha</label>
+                <input type="date" id="filtro_fecha" name="fecha" value="{{ fecha_sel }}" class="form-control" lang="es-MX">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-guinda w-100">Filtrar</button>
+                <a href="{% url 'reservas:bandeja_solicitudes' %}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de control (Req. 3.0.3 y 8.3.2) -->
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        {% if not solicitudes %}
+        <div class="text-center py-5">
+            <p class="fs-5 fw-semibold text-muted mb-2">No se encontraron solicitudes o reservas</p>
+            <p class="text-muted mb-3">No hay registros pendientes que coincidan con los filtros seleccionados.</p>
+            <a href="{% url 'reservas:bandeja_solicitudes' %}" class="btn btn-outline-primary btn-sm">Mostrar todas las solicitudes</a>
+        </div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Folio</th>
+                        <th>Alumno</th>
+                        <th>Boleta</th>
+                        <th>Equipos Solicitados</th>
+                        <th>Fecha y Bloque Horario</th>
+                        <th>Estatus</th>
+                        <th class="text-end pe-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in solicitudes %}
+                    <tr>
+                        <td class="ps-3 fw-bold">#{{ s.folio }}</td>
+                        <td>{{ s.alumno }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ s.boleta }}</span></td>
+                        <td>{{ s.equipos }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ s.fecha_formateada }}</div>
+                            <small class="text-muted">{{ s.bloque }} hrs</small>
+                        </td>
+                        <td>
+                            {% if s.estatus == 'CONFIRMADA' %}
+                            <span class="badge text-bg-success">Confirmada</span>
+                            {% elif s.estatus == 'SIN_CONFIRMAR' %}
+                            <span class="badge text-bg-warning">Sin confirmar</span>
+                            {% elif s.estatus == 'ATENDIDA' %}
+                            <span class="badge text-bg-primary">Atendida</span>
+                            {% else %}
+                            <span class="badge text-bg-secondary">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-3">
+                            {% if s.estatus == 'CONFIRMADA' or s.estatus == 'SIN_CONFIRMAR' %}
+                            <div class="d-inline-flex gap-1">
+                                <form method="post" action="{% url 'reservas:bandeja_solicitudes' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="folio" value="{{ s.folio }}">
+                                    <input type="hidden" name="accion" value="atender">
+                                    <button type="submit" class="btn btn-guinda btn-sm">Atender</button>
+                                </form>
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-cancelar-op"
+                                        data-bs-toggle="modal" data-bs-target="#modalCancelarOperador"
+                                        data-folio="{{ s.folio }}">Cancelar</button>
+                            </div>
+                            {% else %}
+                            <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="modalCancelarOperador" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Confirmar cancelación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Deseas cancelar la solicitud <strong id="folioOpCancelar"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Conservar solicitud</button>
+                <form method="post" action="{% url 'reservas:bandeja_solicitudes' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="folio" id="folioOpCancelarInput">
+                    <input type="hidden" name="accion" value="cancelar">
+                    <button type="submit" class="btn btn-danger">Confirmar cancelación</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const folioTexto = document.getElementById("folioOpCancelar");
+    const folioInput = document.getElementById("folioOpCancelarInput");
+
+    document.querySelectorAll(".btn-cancelar-op").forEach(function (button) {
+        button.addEventListener("click", function () {
+            folioTexto.textContent = this.dataset.folio;
+            folioInput.value = this.dataset.folio;
+        });
+    });
+});
+</script>
+{% endblock %}

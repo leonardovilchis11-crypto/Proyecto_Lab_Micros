@@ -1,0 +1,168 @@
+{% if request.user.is_authenticated %}
+<div id="aviso-inactividad" class="session-timeout" role="alertdialog"
+     aria-labelledby="aviso-inactividad-titulo" aria-describedby="aviso-inactividad-texto"
+     aria-modal="true" hidden>
+    <div class="session-timeout-card">
+        <h2 id="aviso-inactividad-titulo">Tu sesión está por cerrarse</h2>
+        <p id="aviso-inactividad-texto">
+            Por seguridad, se cerrará tu sesión por inactividad en
+            <strong><span id="cuenta-regresiva-inactividad">60</span> segundos</strong>.
+        </p>
+        <p id="estado-renovacion-sesion" class="session-timeout-status" aria-live="polite"></p>
+        <button type="button" id="continuar-sesion" class="session-timeout-button">
+            Continuar sesión
+        </button>
+    </div>
+</div>
+
+<form id="cerrar-sesion-inactividad" method="post" action="{% url 'logout' %}" hidden>
+    {% csrf_token %}
+    <input type="hidden" name="inactividad" value="1">
+</form>
+<form id="renovar-sesion-csrf" hidden>
+    {% csrf_token %}
+</form>
+
+<style>
+    .session-timeout[hidden],
+    #cerrar-sesion-inactividad[hidden],
+    #renovar-sesion-csrf[hidden] {
+        display: none !important;
+    }
+    .session-timeout {
+        position: fixed;
+        z-index: 2000;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, .55);
+    }
+    .session-timeout-card {
+        width: min(100%, 430px);
+        padding: 1.5rem;
+        border-radius: .75rem;
+        background: #fff;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .25);
+        text-align: center;
+    }
+    .session-timeout-card h2 {
+        margin-bottom: .75rem;
+        color: #6a1b29;
+        font-size: 1.35rem;
+    }
+    .session-timeout-card p {
+        margin-bottom: 1rem;
+    }
+    .session-timeout-status {
+        color: #b02a37;
+        font-size: .9rem;
+    }
+    .session-timeout-button {
+        padding: .65rem 1.25rem;
+        border: 0;
+        border-radius: .4rem;
+        background: #6a1b29;
+        color: #fff;
+        font-weight: 600;
+    }
+    .session-timeout-button:hover,
+    .session-timeout-button:focus {
+        background: #4e121d;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const aviso = document.getElementById("aviso-inactividad");
+    const contador = document.getElementById("cuenta-regresiva-inactividad");
+    const estado = document.getElementById("estado-renovacion-sesion");
+    const continuar = document.getElementById("continuar-sesion");
+    const formularioCerrar = document.getElementById("cerrar-sesion-inactividad");
+    const csrf = document.querySelector("#renovar-sesion-csrf [name=csrfmiddlewaretoken]");
+    const duracion = 10 * 60 * 1000;
+    const anticipacion = 60 * 1000;
+    const intervaloRenovacion = 60 * 1000;
+    let ultimaActividad = Date.now();
+    let ultimaRenovacion = Date.now();
+    let avisoVisible = false;
+    let renovando = false;
+
+    function cerrarPorInactividad() {
+        formularioCerrar.requestSubmit();
+    }
+
+    async function renovarSesion() {
+        if (renovando) return false;
+        renovando = true;
+        try {
+            const respuesta = await fetch("{% url 'session_keepalive' %}", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": csrf.value,
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+            if (!respuesta.ok) {
+                estado.textContent = "No se pudo renovar la sesión. Inicia sesión nuevamente si se cierra.";
+                return false;
+            }
+            ultimaRenovacion = Date.now();
+            estado.textContent = "";
+            return true;
+        } catch (error) {
+            estado.textContent = "No se pudo conectar para renovar la sesión. Revisa tu conexión.";
+            return false;
+        } finally {
+            renovando = false;
+        }
+    }
+
+    function registrarActividad(evento) {
+        if (evento && evento.target.closest && evento.target.closest("#continuar-sesion")) return;
+        ultimaActividad = Date.now();
+        if (avisoVisible) {
+            aviso.hidden = true;
+            avisoVisible = false;
+        }
+        if (ultimaActividad - ultimaRenovacion >= intervaloRenovacion) {
+            renovarSesion();
+        }
+    }
+
+    function actualizarTemporizador() {
+        const restante = duracion - (Date.now() - ultimaActividad);
+        if (restante <= 0) {
+            cerrarPorInactividad();
+            return;
+        }
+
+        if (restante <= anticipacion) {
+            aviso.hidden = false;
+            avisoVisible = true;
+            contador.textContent = String(Math.ceil(restante / 1000));
+        }
+        window.setTimeout(actualizarTemporizador, 1000);
+    }
+
+    ["pointerdown", "keydown", "input", "scroll", "touchstart", "mousemove"].forEach(function (tipo) {
+        document.addEventListener(tipo, registrarActividad, { passive: true });
+    });
+
+    continuar.addEventListener("click", async function () {
+        continuar.disabled = true;
+        estado.textContent = "Renovando tu sesión...";
+        const renovada = await renovarSesion();
+        continuar.disabled = false;
+        if (renovada) {
+            ultimaActividad = Date.now();
+            aviso.hidden = true;
+            avisoVisible = false;
+        }
+    });
+
+    actualizarTemporizador();
+});
+</script>
+{% endif %}

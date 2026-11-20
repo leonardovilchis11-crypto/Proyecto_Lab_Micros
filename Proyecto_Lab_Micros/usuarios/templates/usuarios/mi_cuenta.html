@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Cuenta - Laboratorio de Microcontroladores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom { background-color: #6a1b29; color: white; }
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-custom px-4 py-2">
+        <span class="navbar-brand mb-0 h1 text-white">
+            ESIME Culhuacán — Mi Cuenta ({{ usuario.get_rol_display }})
+        </span>
+        <form action="{% url 'logout' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+        </form>
+    </nav>
+
+    <div class="container mt-4" style="max-width: 600px;">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-sm">← Volver al Panel Principal</a>
+    </div>
+
+    <div class="container mt-3 mb-5" style="max-width: 600px;">
+        <div class="card shadow p-4 border-top border-4" style="border-color: #6a1b29 !important;">
+            <h4 class="mb-3" style="color: #6a1b29;">Datos de Identificación</h4>
+
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item"><strong>Nombre:</strong> {{ usuario.nombre_completo }}</li>
+                <li class="list-group-item">
+                    <strong>{% if usuario.rol == 'ALUMNO' %}Número de Boleta:{% else %}Número de Credencial:{% endif %}</strong>
+                    {{ usuario.boleta_credencial|default:"No registrado" }}
+                </li>
+                <li class="list-group-item"><strong>Correo Institucional:</strong> {{ usuario.correo_institucional|default:usuario.email|default:"No registrado" }}</li>
+                <li class="list-group-item"><strong>Rol en el Sistema:</strong> <span class="badge bg-secondary">{{ usuario.get_rol_display }}</span></li>
+                <li class="list-group-item"><strong>Estatus Actual:</strong> 
+                    <span class="badge {% if usuario.estatus == 'ACTIVO' %}bg-success{% elif usuario.estatus == 'SANCIONADO' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ usuario.get_estatus_display }}
+                    </span>
+                </li>
+            </ul>
+
+            <div class="d-grid gap-2 mb-2">
+                <a href="{% url 'password_change' %}" class="btn btn-outline-dark">Cambiar mi contraseña</a>
+            </div>
+
+            {% if usuario.rol == 'ADMINISTRADOR' %}
+                <div class="d-grid gap-2">
+                    <a href="{% url 'padron_usuarios' %}" class="btn text-white" style="background-color: #6a1b29;">Ver Padrón de Usuarios (Admin)</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
+    </footer>
+    {% include "shared/session_timeout.html" %}
+</body>
+</html>
+

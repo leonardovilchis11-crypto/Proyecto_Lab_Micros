@@ -1,0 +1,185 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Devolución de equipos | ESIME Culhuacán{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="h4 fw-bold mb-1" style="color: var(--ipn-guinda);">Recepción de Equipos</h2>
+    <p class="text-muted mb-0">Escanea el código de barras del equipo o ingresa la boleta del alumno para consultar sus préstamos activos.</p>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="post" class="row g-2 align-items-end sin-aviso">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="buscar">
+            <div class="col-md-9">
+                <label for="boleta" class="form-label fw-semibold">Código de barras / boleta del alumno</label>
+                <input id="boleta" name="boleta" value="{{ entrada|default:boleta }}" class="form-control form-control-lg"
+                       placeholder="Escanea o escribe la boleta" autocomplete="off" autofocus>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-guinda btn-lg w-100">Buscar préstamo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if prestamo %}
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <section class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h3 class="h6 fw-bold text-uppercase text-secondary border-bottom pb-2">Datos del alumno</h3>
+                <div class="d-flex align-items-center gap-3 mt-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                         style="background-color: var(--ipn-guinda); width: 48px; height: 48px;">
+                        {% if alumno %}{{ alumno.first_name|first|upper }}{% else %}A{% endif %}
+                    </div>
+                    <div>
+                        <div class="fw-semibold">
+                            {% if alumno %}{{ alumno.get_full_name|default:alumno.boleta_credencial }}{% else %}Alumno{% endif %}
+                        </div>
+                        <small class="text-muted">Boleta: {{ boleta }}</small>
+                    </div>
+                </div>
+                <div class="alert alert-light border mt-3 mb-0">
+                    <small class="text-muted d-block">Préstamo activo</small>
+                    <strong>{{ prestamo.folio }}</strong>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-7">
+        <section class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h3 class="h6 fw-bold text-uppercase text-secondary border-bottom pb-2">Detalle del préstamo</h3>
+                <div class="list-group list-group-flush mt-2">
+                    {% for articulo in articulos %}
+                    <div class="list-group-item px-0">
+                        <div class="fw-semibold">{{ articulo.nombre }}</div>
+                        <code>{{ articulo.id_unico }}</code>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0">No hay piezas asociadas a este préstamo.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% if articulos %}
+<form method="post" class="card shadow-sm border-0 mb-4" id="formDevolucion">
+    {% csrf_token %}
+    <input type="hidden" name="accion" value="registrar">
+    <input type="hidden" name="boleta" value="{{ boleta }}">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-2 mb-3 gap-2">
+            <div>
+                <h3 class="h5 fw-bold mb-1">Evaluación de entrega</h3>
+                <p class="text-muted small mb-0">Registra el estado de cada pieza antes de cerrar la devolución.</p>
+            </div>
+            <span class="badge text-bg-light border">{{ articulos|length }} pieza(s)</span>
+        </div>
+
+        {% for articulo in articulos %}
+        <section class="rounded border p-3 mb-3">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                <div>
+                    <h4 class="h6 fw-bold mb-1">{{ articulo.nombre }}</h4>
+                    <code>{{ articulo.id_unico }}</code>
+                </div>
+                <span class="badge text-bg-warning align-self-start">Prestado</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label for="estado_{{ articulo.id }}" class="form-label fw-semibold">Estado de devolución</label>
+                    <select id="estado_{{ articulo.id }}" name="estado_{{ articulo.id }}"
+                            class="form-select estado-devolucion" required>
+                        <option value="DISPONIBLE" {% if articulo.estado_seleccionado == 'DISPONIBLE' %}selected{% endif %}>Buen estado (Disponible)</option>
+                        <option value="MANTENIMIENTO" {% if articulo.estado_seleccionado == 'MANTENIMIENTO' %}selected{% endif %}>En mantenimiento</option>
+                        <option value="DANADO" {% if articulo.estado_seleccionado == 'DANADO' %}selected{% endif %}>Dañado</option>
+                    </select>
+                </div>
+                <div class="col-md-7">
+                    <label for="observaciones_{{ articulo.id }}" class="form-label fw-semibold">
+                        Observaciones <span class="text-muted fw-normal">(obligatorias si requiere atención)</span>
+                    </label>
+                    <textarea id="observaciones_{{ articulo.id }}" name="observaciones_{{ articulo.id }}"
+                              class="form-control observaciones-devolucion" rows="2" maxlength="1000"
+                              placeholder="Describe la falla física o lógica, si aplica.">{{ articulo.observaciones_capturadas }}</textarea>
+                </div>
+            </div>
+        </section>
+        {% endfor %}
+
+        <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 pt-2">
+            <span class="small text-muted">Las fallas se registrarán en el historial y el inventario se actualizará por pieza.</span>
+            <button type="submit" class="btn btn-danger px-4">Registrar devolución</button>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endif %}
+
+{% if historial %}
+<section class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h3 class="h6 fw-bold mb-0">Devoluciones recientes</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Boleta</th>
+                    <th>Equipo</th>
+                    <th>Estado recibido</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in historial %}
+                <tr>
+                    <td>{{ registro.fecha }}</td>
+                    <td>{{ registro.boleta }}</td>
+                    <td>{{ registro.nombre }} <code class="d-block">{{ registro.id_unico }}</code></td>
+                    <td>
+                        {% if registro.estatus == 'DISPONIBLE' %}Buen estado
+                        {% elif registro.estatus == 'MANTENIMIENTO' %}En mantenimiento
+                        {% else %}Dañado{% endif %}
+                    </td>
+                    <td>{{ registro.observaciones|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const boleta = document.getElementById("boleta");
+    if (boleta) {
+        boleta.focus();
+        boleta.select();
+    }
+
+    document.querySelectorAll(".estado-devolucion").forEach(function (estado) {
+        const observaciones = document.getElementById(
+            estado.name.replace("estado_", "observaciones_")
+        );
+        const actualizarRequerido = function () {
+            observaciones.required = estado.value !== "DISPONIBLE";
+        };
+        estado.addEventListener("change", actualizarRequerido);
+        actualizarRequerido();
+    });
+});
+</script>
+{% endblock %}

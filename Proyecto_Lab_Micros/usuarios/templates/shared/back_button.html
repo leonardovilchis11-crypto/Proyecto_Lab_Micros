@@ -1,0 +1,4 @@
+<a href="{{ fallback_url }}" class="btn btn-outline-secondary btn-sm mb-3"
+   onclick="if (window.history.length > 1 && document.referrer) { const previous = document.createElement('a'); previous.href = document.referrer; if (previous.origin === window.location.origin) { window.history.back(); return false; } }">
+    ← Regresar
+</a>

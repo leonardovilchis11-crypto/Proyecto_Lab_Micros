@@ -1,0 +1,201 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Adeudos y reposiciones | ESIME Culhuacán{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <h2 class="h4 fw-bold mb-1" style="color: var(--ipn-guinda);">Adeudos y reposiciones</h2>
+        <p class="text-muted mb-0">Registro administrativo de materiales dañados o no devueltos y su liquidación.</p>
+    </div>
+    <a href="?{% if query_params %}{{ query_params }}&{% endif %}exportar=csv" class="btn btn-outline-dark">Exportar informe CSV</a>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="filtro_q" class="form-label fw-semibold">Buscar por matrícula, alumno, folio o material</label>
+                <input id="filtro_q" name="q" value="{{ query }}" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label for="filtro_fecha" class="form-label fw-semibold">Fecha de registro</label>
+                <input id="filtro_fecha" type="date" name="fecha" value="{{ fecha_sel }}" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label for="filtro_estatus" class="form-label fw-semibold">Estatus</label>
+                <select id="filtro_estatus" name="estatus" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="ACTIVO" {% if estatus_sel == 'ACTIVO' %}selected{% endif %}>Activo</option>
+                    <option value="LIQUIDADO" {% if estatus_sel == 'LIQUIDADO' %}selected{% endif %}>Liquidado</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-guinda w-100">Filtrar</button>
+                <a href="{% url 'reservas:adeudos' %}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="small text-muted">Adeudos activos</div>
+                <div class="fs-3 fw-bold">{{ total_activos }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="small text-muted">Montos registrados (MXN)</div>
+                <div class="fs-3 fw-bold">${{ total_monto|floatformat:2 }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="small text-muted">Pendientes de valoración</div>
+                <div class="fs-3 fw-bold">{{ pendientes_valoracion }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white text-muted small">
+        Total de registros encontrados: <strong>{{ total_registros }}</strong>
+    </div>
+    {% if not adeudos %}
+        <div class="text-center py-5">
+            <p class="fs-5 fw-semibold text-muted mb-2">No hay adeudos registrados</p>
+            <p class="text-muted mb-0">Los daños y préstamos que excedan su fecha límite aparecerán aquí.</p>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th><a href="?{{ enlaces_orden.alumno }}" class="text-decoration-none text-dark">Alumno / matrícula ↕</a><br><a href="?{{ enlaces_orden.folio }}" class="text-decoration-none text-dark">Folio ↕</a></th>
+                        <th><a href="?{{ enlaces_orden.material }}" class="text-decoration-none text-dark">Material y motivo ↕</a></th>
+                        <th>Valorar o registrar reposición</th>
+                        <th><a href="?{{ enlaces_orden.estatus }}" class="text-decoration-none text-dark">Estatus / liquidación ↕</a></th>
+                        <th><a href="?{{ enlaces_orden.fecha }}" class="text-decoration-none text-dark">Fecha de registro ↕</a></th>
+                        <th>Historial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adeudo in adeudos %}
+                    <tr>
+                        <td>
+                            <strong>{{ adeudo.alumno.get_full_name|default:adeudo.alumno.boleta_credencial }}</strong>
+                            <small class="d-block text-muted">{{ adeudo.alumno.boleta_credencial }}</small>
+                            <small class="d-block">Folio {{ adeudo.solicitud.folio }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ adeudo.get_tipo_display }}</strong>
+                            <span class="d-block">{{ adeudo.material }}</span>
+                            <code>{{ adeudo.id_material }}</code>
+                            <small class="d-block text-muted">{{ adeudo.motivo }}</small>
+                        </td>
+                        <td>
+                            {% if adeudo.estatus == 'ACTIVO' %}
+                            <form method="post" class="d-grid gap-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="accion" value="valorar">
+                                <input type="hidden" name="adeudo_id" value="{{ adeudo.pk }}">
+                                <div>
+                                    <label class="form-label small">Monto (MXN)</label>
+                                    {{ adeudo.form_valoracion.monto }}
+                                </div>
+                                <div>
+                                    <label class="form-label small">O pieza de reposición</label>
+                                    {{ adeudo.form_valoracion.pieza_reposicion }}
+                                </div>
+                                {% if adeudo.form_valoracion.non_field_errors %}
+                                    <div class="text-danger small">{{ adeudo.form_valoracion.non_field_errors }}</div>
+                                {% endif %}
+                                {% if adeudo.form_valoracion.monto.errors %}
+                                    <div class="text-danger small">{{ adeudo.form_valoracion.monto.errors }}</div>
+                                {% endif %}
+                                {% if adeudo.form_valoracion.pieza_reposicion.errors %}
+                                    <div class="text-danger small">{{ adeudo.form_valoracion.pieza_reposicion.errors }}</div>
+                                {% endif %}
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Guardar valoración</button>
+                            </form>
+                            {% else %}
+                                {% if adeudo.monto %}${{ adeudo.monto }}
+                                {% elif adeudo.pieza_reposicion %}{{ adeudo.pieza_reposicion }}
+                                {% else %}Sin valoración{% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if adeudo.estatus == 'ACTIVO' %}
+                                <span class="badge text-bg-danger mb-2">Activo</span>
+                                <form method="post" class="d-grid gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="accion" value="liquidar">
+                                    <input type="hidden" name="adeudo_id" value="{{ adeudo.pk }}">
+                                    <label class="form-check small">
+                                        <input class="form-check-input" type="checkbox" name="confirmar_liquidacion" required>
+                                        Confirmo el pago o recepción de la reposición
+                                    </label>
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Liquidar adeudo / Levantar sanción
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="badge text-bg-success">Liquidado</span>
+                                <small class="d-block">{{ adeudo.liquidado_en|date:"d/m/Y H:i" }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ adeudo.creado_en|date:"d/m/Y H:i" }}
+                        </td>
+                        <td>
+                            <ul class="small mb-0 ps-3">
+                                {% for movimiento in adeudo.historial.all %}
+                                    <li>
+                                        {{ movimiento.creado_en|date:"d/m/Y H:i" }} —
+                                        {{ movimiento.get_accion_display }}:
+                                        {{ movimiento.detalle }}
+                                        {% if movimiento.actor %}
+                                            <span class="text-muted">({{ movimiento.actor.boleta_credencial }})</span>
+                                        {% else %}
+                                            <span class="text-muted">(Sistema)</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <small class="text-muted">
+                    {% if total_registros %}Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ total_registros }} registros.{% else %}0 registros.{% endif %}
+                </small>
+                <nav aria-label="Paginación del informe de adeudos">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                            {% if page_obj.has_previous %}
+                            <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                            {% else %}<span class="page-link">Anterior</span>{% endif %}
+                        </li>
+                        <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+                        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                            {% if page_obj.has_next %}
+                            <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                            {% else %}<span class="page-link">Siguiente</span>{% endif %}
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Perfil - ESIME</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom { background-color: #6a1b29; color: white; }
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+        .card-perfil {
+            border-top: 5px solid #6a1b29;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-perfil:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-custom px-4 py-2">
+        <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán — Registro de Cuenta</span>
+    </nav>
+
+    <div class="container mt-5 mb-5" style="max-width: 780px;">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold" style="color: #6a1b29;">¿Con qué perfil deseas registrarte?</h3>
+            <p class="text-muted">Selecciona tu rol dentro del Laboratorio de Microcontroladores</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Opción 1: Alumno -->
+            <div class="col-md-6">
+                <div class="card card-perfil shadow-sm h-100 p-4 text-center">
+                    <h4 class="fw-bold mb-2" style="color: #6a1b29;">Soy Alumno</h4>
+                    <p class="text-muted small mb-4">
+                        Para estudiantes inscritos que necesitan consultar el catálogo, apartar equipos por bloque horario y revisar sus préstamos.
+                    </p>
+                    <div class="text-start small bg-light p-2 rounded mb-4">
+                        <strong>Requisitos:</strong><br>
+                        • Boleta de 10 dígitos<br>
+                        • Correo <code>@alumno.ipn.mx</code>
+                    </div>
+                    <a href="{% url 'registro_alumno' %}" class="btn text-white w-100 mt-auto" style="background-color: #6a1b29;">
+                        Registrarme como Alumno
+                    </a>
+                </div>
+            </div>
+
+            <!-- Opción 2: Laboratorista -->
+            <div class="col-md-6">
+                <div class="card card-perfil shadow-sm h-100 p-4 text-center">
+                    <h4 class="fw-bold mb-2" style="color: #6a1b29;">Soy Laboratorista</h4>
+                    <p class="text-muted small mb-4">
+                        Para personal técnico encargado de atender solicitudes en ventanilla, entregar equipos, registrar devoluciones y gestionar inventario.
+                    </p>
+                    <div class="text-start small bg-light p-2 rounded mb-4">
+                        <strong>Requisitos:</strong><br>
+                        • Número de empleado / credencial<br>
+                        • Correo <code>@ipn.mx</code>
+                    </div>
+                    <a href="{% url 'registro_laboratorista' %}" class="btn text-white w-100 mt-auto" style="background-color: #6a1b29;">
+                        Registrarme como Laboratorista
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'login' %}" class="text-decoration-none text-secondary">
+                ← Ya tengo cuenta, regresar al Inicio de Sesión
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
+    </footer>
+</body>
+</html>

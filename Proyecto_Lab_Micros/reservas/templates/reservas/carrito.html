@@ -1,0 +1,217 @@
+{% extends 'reservas/base_reservas.html' %}
+
+{% block title %}Carrito de Solicitudes — ESIME Culhuacán{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: #6a1b29;">Carrito de Solicitudes y Reserva</h2>
+        <p class="text-muted mb-0">Revisa los materiales agregados desde el catálogo, ajusta cantidades y programa tu horario de práctica.</p>
+    </div>
+    <a href="{% url 'catalogo:lista' %}" class="btn btn-outline-secondary">
+        + Seguir explorando catálogo
+    </a>
+</div>
+
+{% if bloqueado_por_adeudo %}
+<div class="alert alert-danger border-start border-5 border-danger shadow-sm mb-4" role="alert">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+            <h5 class="alert-heading fw-bold mb-1">
+                Solicitud bloqueada — Estatus: {{ estatus_alumno }} (Req. 3.1)
+            </h5>
+            <p class="mb-2">
+                No puedes generar nuevas solicitudes ni reservas porque tienes material con entrega vencida o adeudos activos registrados en el laboratorio:
+            </p>
+            {% if adeudos_activos %}
+                <ul class="mb-2">
+                    {% for adeudo in adeudos_activos %}
+                        <li>
+                            <strong>{{ adeudo.material }}</strong> (<code>{{ adeudo.id_material }}</code>) —
+                            <span class="badge bg-danger">{{ adeudo.get_tipo_display }}</span>:
+                            {{ adeudo.motivo }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small class="text-dark">
+                Acude a ventanilla del laboratorio para devolver el equipo o liquidar tu adeudo y restablecer tu estatus a <strong>Activo</strong>.
+            </small>
+        </div>
+        <a href="{% url 'reservas:mis_reservas' %}" class="btn btn-danger btn-sm fw-semibold">
+            Ver mis adeudos y préstamos
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Columna izquierda: Listado editable de artículos (Req. 3.3.1) -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0" style="border-top: 4px solid #6a1b29 !important;">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Equipos en tu solicitud</h5>
+                <span class="badge text-bg-dark">{{ total_articulos }} pieza(s)</span>
+            </div>
+            <div class="card-body">
+                {% if carrito %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Material / Equipo</th>
+                                    <th style="width: 150px;">Cantidad</th>
+                                    <th class="text-end">Quitar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in carrito %}
+                                <tr>
+                                    <td><span class="badge bg-light text-dark border">{{ item.id_unico }}</span></td>
+                                    <td class="fw-semibold">{{ item.nombre }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'reservas:carrito' %}" class="d-flex gap-1">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="accion" value="actualizar_cantidad">
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="20" class="form-control form-control-sm text-center">
+                                            <button type="submit" class="btn btn-sm btn-outline-dark" title="Actualizar">OK</button>
+                                        </form>
+                                    </td>
+                                    <td class="text-end">
+                                        <form method="post" action="{% url 'reservas:carrito' %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="accion" value="eliminar_item">
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <p class="text-muted mb-3">Tu carrito de solicitudes está vacío actualmente.</p>
+                        <a href="{% url 'catalogo:lista' %}" class="btn btn-guinda">
+                            Ir al Catálogo de Equipos
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Columna derecha: Fecha hábil, bloque horario y reglamento (Req. 1.6, 3.1, 3.4, 4.0) -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0" style="border-top: 4px solid #6a1b29 !important;">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Programación de Reserva y Confirmación</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'reservas:carrito' %}" id="formConfirmarReserva">
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="confirmar_solicitud">
+
+                    <div class="mb-3">
+                        <label for="fecha_reserva" class="form-label fw-semibold">1. Fecha de práctica (Lunes a Viernes)</label>
+                        <input type="date" id="fecha_reserva" name="fecha_reserva" min="{{ fecha_minima }}" value="{{ fecha_minima }}" data-hoy="{{ fecha_minima }}" data-hora-actual="{{ hora_actual }}" class="form-control" lang="es-MX" required {% if bloqueado_por_adeudo %}disabled{% endif %}>
+                        <div class="form-text text-danger d-none" id="aviso-finde">
+                            Sábados y domingos están deshabilitados. Elige un día hábil de lunes a viernes.
+                        </div>
+                        <div class="form-text text-danger d-none" id="aviso-hora-sin-bloques">
+                            Ya no quedan bloques disponibles para hoy. Elige otra fecha.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bloque_horario" class="form-label fw-semibold">2. Bloque horario (07:00 a 22:00 hrs)</label>
+                        <select id="bloque_horario" name="bloque_horario" class="form-select" required {% if bloqueado_por_adeudo %}disabled{% endif %}>
+                            <option value="">Selecciona un bloque...</option>
+                            {% for b in bloques %}
+                                <option value="{{ b }}" data-hora-inicio="{{ b|slice:'0:5' }}">{{ b }} hrs</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text text-muted d-none" id="aviso-hora">
+                            Para hoy solo están disponibles los bloques que aún no han comenzado. Hora local: {{ hora_actual }}.
+                        </div>
+                    </div>
+
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="acepto_reglamento" name="acepto_reglamento" required {% if bloqueado_por_adeudo %}disabled{% endif %}>
+                            <label class="form-check-label small" for="acepto_reglamento">
+                                <strong>Acepto el reglamento interno</strong> del Laboratorio de Microcontroladores y me comprometo a devolver el material completo y en buen estado dentro del bloque seleccionado.
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-guinda py-2 fw-bold" {% if not carrito or bloqueado_por_adeudo %}disabled{% endif %}>
+                            {% if bloqueado_por_adeudo %}
+                                Solicitud Bloqueada por Adeudo Activo
+                            {% else %}
+                                Confirmar Solicitud y Reserva
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validación instantánea de días hábiles en cliente (Req. 3.4 / 4.0)
+    const inputFecha = document.getElementById('fecha_reserva');
+    const avisoFinde = document.getElementById('aviso-finde');
+    const selectorBloque = document.getElementById('bloque_horario');
+    const avisoHora = document.getElementById('aviso-hora');
+    if (inputFecha) {
+        const actualizarBloques = function () {
+            const esHoy = inputFecha.value === inputFecha.dataset.hoy;
+            let hayBloquesDisponibles = false;
+            avisoHora.classList.toggle('d-none', !esHoy);
+
+            selectorBloque.querySelectorAll('option[data-hora-inicio]').forEach(function (opcion) {
+                opcion.disabled = esHoy && opcion.dataset.horaInicio <= inputFecha.dataset.horaActual;
+                if (!opcion.disabled) {
+                    hayBloquesDisponibles = true;
+                }
+            });
+
+            const bloqueSeleccionado = selectorBloque.selectedOptions[0];
+            if (bloqueSeleccionado && bloqueSeleccionado.disabled) {
+                selectorBloque.value = '';
+            }
+
+            document.getElementById('aviso-hora-sin-bloques').classList.toggle(
+                'd-none',
+                !esHoy || hayBloquesDisponibles
+            );
+        };
+
+        inputFecha.addEventListener('change', function () {
+            if (!this.value) {
+                actualizarBloques();
+                return;
+            }
+            const partes = this.value.split('-');
+            const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+            const dia = fecha.getDay(); // 0 = Domingo, 6 = Sábado
+            if (dia === 0 || dia === 6) {
+                avisoFinde.classList.remove('d-none');
+                this.value = '';
+            } else {
+                avisoFinde.classList.add('d-none');
+            }
+            actualizarBloques();
+        });
+        actualizarBloques();
+    }
+</script>
+{% endblock %}

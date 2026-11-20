@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Equipos — Laboratorio de Microprocesadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Req. 8.4, 8.4.1, 8.4.2 y 8.5: Identidad visual IPN/ESIME, mínimo 14px, foco accesible y responsivo */
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 15px; background-color: #f5f5f5; padding-top: 56px; padding-bottom: 60px; }
+        .navbar-custom { background-color: #6a1b29; color: white; position: fixed; top: 0; width: 100%; z-index: 1030; }
+        .footer-custom { background-color: #333333; color: white; position: fixed; bottom: 0; width: 100%; z-index: 1030; }
+        .logo-badge { background-color: #ffffff; color: #6a1b29; font-weight: 800; padding: 4px 10px; border-radius: 4px; margin-right: 10px; font-size: 0.95rem; }
+        .card-equipo { border-top: 4px solid #6a1b29; transition: transform 0.15s ease; }
+        .card-equipo:hover { transform: translateY(-3px); }
+        a:focus, button:focus, input:focus, select:focus { outline: 3px solid #0d6efd !important; outline-offset: 2px; }
+        /* Req. 2.3 Semáforo de estados accesible */
+        .semaforo-verde { background-color: #198754; color: #fff; font-weight: 600; }
+        .semaforo-amarillo { background-color: #ffc107; color: #000; font-weight: 600; }
+        .semaforo-rojo { background-color: #dc3545; color: #fff; font-weight: 600; }
+    </style>
+</head>
+<body class="fixed-brand-layout">
+    {% include "shared/brand_logos.html" %}
+    <!-- Req. 8.4.2 Encabezado fijo con logotipo de la ESIME y nombre del sistema -->
+    <nav class="navbar navbar-custom px-4 py-2 shadow-sm">
+        <div class="d-flex align-items-center">
+            <span class="navbar-brand mb-0 h1 text-white fs-5">Sistema de Préstamos — Laboratorio de Microprocesadores</span>
+        </div>
+        {% include "shared/role_navigation.html" %}
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light text-dark px-3 py-2">🛒 Carrito: {{ carrito_count }} artículo(s)</span>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">Regresar al Panel Principal</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4 mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <h2 class="mb-0" style="color: #6a1b29;">Catálogo de Equipos, Instrumentos y Microcontroladores</h2>
+            <span class="text-muted small">Horario de servicio: Lunes a Viernes de 07:00 a 22:00 hrs.</span>
+        </div>
+
+        {% if mensaje_catalogo %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>¡Operación exitosa!</strong> {{ mensaje_catalogo }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        {% endif %}
+
+        <!-- Req. 2.0.1 Buscador de catálogo con filtros por nombre/ID, categoría y disponibilidad -->
+        <form method="get" action="{% url 'catalogo:lista' %}" class="card p-3 shadow-sm mb-4 border-0">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label for="buscarInput" class="form-label fw-bold small mb-1">Buscar por nombre o identificador único (ID):</label>
+                    <input type="text" id="buscarInput" name="q" value="{{ query }}" class="form-control" placeholder="Ej. ESP32, Fuente, Caimán, Osciloscopio, MIC-ESP32-001...">
+                </div>
+                <div class="col-md-3">
+                    <label for="catSelect" class="form-label fw-bold small mb-1">Categoría de material:</label>
+                    <select id="catSelect" name="categoria" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        {% for cat in categorias %}
+                        <option value="{{ cat }}" {% if categoria_sel == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="dispSelect" class="form-label fw-bold small mb-1">Disponibilidad:</label>
+                    <select id="dispSelect" name="disponibilidad" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="DISPONIBLE" {% if disponibilidad_sel == 'DISPONIBLE' %}selected{% endif %}>🟢 Disponible</option>
+                        <option value="PRESTADO" {% if disponibilidad_sel == 'PRESTADO' %}selected{% endif %}>🟡 Prestado</option>
+                        <option value="MANTENIMIENTO" {% if disponibilidad_sel == 'MANTENIMIENTO' %}selected{% endif %}>🔴 En mantenimiento</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button class="btn text-white w-100" style="background-color: #6a1b29;" type="submit">Filtrar</button>
+                    {% if query or categoria_sel or disponibilidad_sel %}
+                    <a href="{% url 'catalogo:lista' %}" class="btn btn-outline-secondary" title="Limpiar filtros">Limpiar</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+        <!-- Resultados del Catálogo -->
+        <div class="row g-4">
+            {% for item in equipos %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-equipo shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+                            <h5 class="card-title mb-0 fw-bold">{{ item.nombre }}</h5>
+                            <!-- Req. 2.3 Semáforo de estados con etiqueta descriptiva obligatoria -->
+                            {% if item.disponibles > 0 %}
+                                <span class="badge semaforo-verde">● Disponible ({{ item.disponibles }})</span>
+                            {% elif item.prestados > 0 %}
+                                <span class="badge semaforo-amarillo">● Prestado</span>
+                            {% else %}
+                                <span class="badge semaforo-rojo">● En mantenimiento</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="text-muted small mb-1">
+                            <strong>ID ref:</strong> {{ item.id_unico_ejemplo }} | <strong>Categoría:</strong> {{ item.categoria }}
+                        </p>
+                        <p class="text-muted small mb-2">
+                            <strong>Ubicación:</strong> {{ item.estante }} — {{ item.cajon }} | <strong>Total en lab:</strong> {{ item.total_unidades }} u.
+                        </p>
+                        <p class="card-text small text-secondary mb-3">{{ item.especificaciones }}</p>
+
+                        <div class="mt-auto d-grid gap-2">
+                            <a href="{% url 'catalogo:detalle' item.id_representante %}?q={{ query }}&categoria={{ categoria_sel }}&disponibilidad={{ disponibilidad_sel }}" class="btn btn-outline-dark btn-sm">
+                                Ver Ficha de Detalle y Disponibilidad
+                            </a>
+                            {% if item.disponibles > 0 %}
+                            <a href="{% url 'catalogo:agregar_carrito' item.id_representante %}" class="btn btn-sm text-white" style="background-color: #6a1b29;">
+                                + Agregar al Carrito de Solicitud
+                            </a>
+                            {% else %}
+                            <button class="btn btn-sm btn-secondary" disabled title="No hay unidades disponibles para préstamo">
+                                Agregar (No disponible: sin unidades libres)
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Req. 2.0.1 y 8.3.2 Mensaje exacto cuando no existen coincidencias y botón para limpiar filtros -->
+            <div class="col-12">
+                <div class="card p-5 text-center shadow-sm border-0">
+                    <h4 class="text-secondary mb-2">No se encontraron equipos con esos criterios</h4>
+                    <p class="text-muted mb-3">Intenta con otro término de búsqueda o restablece los filtros seleccionados.</p>
+                    <div>
+                        <a href="{% url 'catalogo:lista' %}" class="btn text-white px-4" style="background-color: #6a1b29;">Limpiar filtros aplicados</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Req. 8.4.2 Pie de página institucional permanente -->
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — ESIME Unidad Culhuacán — Laboratorio de Microprocesadores</small>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% include "shared/session_timeout.html" %}
+</body>
+</html>

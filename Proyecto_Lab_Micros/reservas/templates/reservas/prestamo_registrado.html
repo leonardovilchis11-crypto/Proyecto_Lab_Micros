@@ -1,0 +1,22 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Préstamo registrado | Ventanilla ESIME{% endblock %}
+
+{% block content %}
+<section class="card shadow-sm border-0">
+    <div class="card-body p-4 text-center">
+        <div class="text-success mb-3" aria-hidden="true">
+            <span class="fs-1">✓</span>
+        </div>
+        <h2 class="h4 fw-bold" style="color: var(--ipn-guinda);">Préstamo registrado correctamente</h2>
+        <p class="text-muted mb-1">Folio: <strong>{{ solicitud.folio }}</strong></p>
+        <p class="text-muted">Alumno: {{ solicitud.alumno.get_full_name|default:solicitud.alumno.boleta_credencial }}</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+            <a class="btn btn-outline-secondary" href="{% url 'reservas:bandeja_solicitudes' %}">Volver a solicitudes</a>
+            <a class="btn btn-guinda"
+               href="{% url 'reservas:comprobante' solicitud.folio %}"
+               target="_blank" rel="noopener">Ver comprobante PDF</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

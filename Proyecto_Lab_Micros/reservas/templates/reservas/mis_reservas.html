@@ -1,0 +1,216 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Mis Reservas y Préstamos | ESIME Culhuacán{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="h4 fw-bold mb-1" style="color: var(--ipn-guinda);">Mis Reservas y Préstamos</h2>
+        <p class="text-muted mb-0">Consulta tus reservaciones programadas y los equipos que tienes actualmente en préstamo.</p>
+    </div>
+    <a href="{% url 'reservas:carrito' %}" class="btn btn-guinda">+ Nueva Solicitud / Carrito</a>
+</div>
+
+<!-- Sección 1: Reservas Pendientes (Req. 4.0.1 y 4.1) -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+        <h3 class="h6 fw-bold mb-0">1. Reservas Pendientes y Programadas</h3>
+    </div>
+    <div class="card-body">
+        {% if not reservas_pendientes %}
+        <div class="text-center py-4">
+            <p class="fw-semibold text-muted mb-2">No tienes reservas registradas</p>
+            <p class="text-muted mb-3">Puedes apartar material desde el catálogo para tus prácticas de lunes a viernes.</p>
+            <a href="{% url 'reservas:carrito' %}" class="btn btn-outline-primary btn-sm">Ir al carrito de solicitudes</a>
+        </div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Folio</th>
+                        <th>Fecha</th>
+                        <th>Bloque Horario</th>
+                        <th>Materiales Apartados</th>
+                        <th>Estatus</th>
+                        <th class="text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservas_pendientes %}
+                    <tr>
+                        <td class="fw-bold">#{{ r.folio }}</td>
+                        <td>{{ r.fecha_formateada }}</td>
+                        <td>{{ r.bloque }} hrs</td>
+                        <td>{{ r.equipos }}</td>
+                        <td>
+                            {% if r.estatus == 'CONFIRMADA' %}
+                            <span class="badge text-bg-success">Confirmada</span>
+                            {% else %}
+                            <span class="badge text-bg-warning">Sin confirmar</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if r.puede_cancelar %}
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-sm btn-abrir-cancelar"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalConfirmarCancelacion"
+                                    data-url="{% url 'reservas:cancelar_reserva' r.folio %}"
+                                    data-folio="#{{ r.folio }}">
+                                Cancelar reserva
+                            </button>
+                            {% else %}
+                            <span class="text-muted small">Sin acciones disponibles</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Sección 2: Préstamos Activos (Req. 4.0.1 y 8.3.2) -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h3 class="h6 fw-bold mb-0">2. Préstamos Activos en Curso</h3>
+    </div>
+    <div class="card-body">
+        {% if not prestamos_activos %}
+        <div class="text-center py-4">
+            <p class="fw-semibold text-muted mb-1">No tienes préstamos activos</p>
+            <p class="text-muted small mb-0">Cuando recojas equipo en ventanilla aparecerá aquí con su hora límite de entrega.</p>
+        </div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Folio Préstamo</th>
+                        <th>Equipos Recibidos</th>
+                        <th>Hora Límite de Devolución</th>
+                        <th>Estatus</th>
+                        <th>Comprobante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in prestamos_activos %}
+                    <tr>
+                        <td class="fw-bold">#{{ p.folio }}</td>
+                        <td>{{ p.equipos }}</td>
+                        <td class="fw-semibold text-danger">{{ p.hora_limite }}</td>
+                        <td>
+                            <span class="badge text-bg-warning">{{ p.estatus }}</span>
+                        </td>
+                        <td>
+                            {% if p.comprobante %}
+                            <a class="btn btn-outline-dark btn-sm"
+                               href="{% url 'reservas:comprobante' p.folio %}"
+                               target="_blank" rel="noopener">Ver PDF</a>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if historial_adeudos %}
+<div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-white py-3">
+        <h3 class="h6 fw-bold mb-0">Historial de adeudos</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Folio / material</th>
+                    <th>Motivo</th>
+                    <th>Monto o reposición</th>
+                    <th>Estatus</th>
+                    <th>Movimientos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for adeudo in historial_adeudos %}
+                <tr>
+                    <td>{{ adeudo.creado_en|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {{ adeudo.solicitud.folio }}
+                        <small class="d-block">{{ adeudo.material }} ({{ adeudo.id_material }})</small>
+                    </td>
+                    <td>{{ adeudo.get_tipo_display }} — {{ adeudo.motivo }}</td>
+                    <td>
+                        {% if adeudo.monto %}${{ adeudo.monto }}
+                        {% elif adeudo.pieza_reposicion %}{{ adeudo.pieza_reposicion }}
+                        {% else %}Pendiente de valoración{% endif %}
+                    </td>
+                    <td>
+                        {% if adeudo.estatus == 'ACTIVO' %}
+                            <span class="badge text-bg-danger">Activo</span>
+                        {% else %}
+                            <span class="badge text-bg-success">Liquidado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <ul class="small mb-0 ps-3">
+                            {% for movimiento in adeudo.historial.all %}
+                                <li>{{ movimiento.creado_en|date:"d/m/Y H:i" }} — {{ movimiento.detalle }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal de confirmación obligatoria antes de cancelar (Req. 4.1.1) -->
+<div class="modal fade" id="modalConfirmarCancelacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Confirmar cancelación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">¿Estás seguro de que deseas realizar esta acción?</p>
+                <p class="text-muted small mb-0">La reserva <strong id="textoFolioCancelar"></strong> será cancelada y los materiales volverán a estar disponibles en el catálogo.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mantener reserva</button>
+                <form method="post" id="formCancelarReserva" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="reservas:mis_reservas">
+                    <button type="submit" class="btn btn-danger">Sí, cancelar reserva</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const formCancelar = document.getElementById("formCancelarReserva");
+    const textoFolio = document.getElementById("textoFolioCancelar");
+
+    document.querySelectorAll(".btn-abrir-cancelar").forEach(btn => {
+        btn.addEventListener("click", function () {
+            formCancelar.action = this.dataset.url;
+            textoFolio.textContent = this.dataset.folio;
+        });
+    });
+});
+</script>
+{% endblock %}

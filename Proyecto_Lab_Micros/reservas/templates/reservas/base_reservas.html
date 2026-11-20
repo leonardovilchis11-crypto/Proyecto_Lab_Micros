@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Laboratorio de Microcontroladores — ESIME Culhuacán{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ipn-guinda: #6a1b29;
+            --ipn-guinda-oscuro: #4e121d;
+        }
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 60px;
+            font-size: 15px;
+        }
+        .navbar-custom {
+            background-color: var(--ipn-guinda);
+            color: white;
+        }
+        .navbar-custom .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 6px;
+            padding: 6px 12px;
+            margin: 0 2px;
+            transition: background-color 0.2s;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        .navbar-custom .nav-link.active {
+            color: #fff;
+            font-weight: 600;
+            background-color: var(--ipn-guinda-oscuro);
+            border-bottom: 2px solid #fff;
+        }
+        .banner-horario {
+            background-color: #fff3cd;
+            border-bottom: 1px solid #ffe69c;
+            color: #664d03;
+            font-size: 0.88rem;
+        }
+        .btn-guinda {
+            background-color: var(--ipn-guinda);
+            color: white;
+            border: none;
+        }
+        .btn-guinda:hover {
+            background-color: var(--ipn-guinda-oscuro);
+            color: white;
+        }
+        .footer-custom {
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include "shared/brand_logos.html" %}
+    <!-- Barra de navegación principal según el perfil (Req. 1.1.2) -->
+    <nav class="navbar navbar-expand-lg navbar-custom px-4 py-2 shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold" href="/usuarios/inicio/">
+                ESIME Culhuacán — Lab. Microcontroladores
+            </a>
+            <button class="navbar-toggler border-light" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir navegación">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menuPrincipal">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                    {% if request.user.rol == 'ALUMNO' %}
+                        <!-- MENÚ EXCLUSIVO ALUMNO (Req. 1.1.2) -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/usuarios/inicio/">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'carrito' %}active{% endif %}"
+                               href="{% url 'reservas:carrito' %}">
+                                Carrito
+                                <span class="badge bg-light text-dark ms-1">
+                                    {{ carrito_count|default:request.session.carrito_solicitud|length }}
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'mis_reservas' %}active{% endif %}"
+                               href="{% url 'reservas:mis_reservas' %}">
+                                Mis reservas y préstamos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'mi_cuenta' %}">Mi cuenta</a>
+                        </li>
+
+                    {% elif request.user.rol == 'LABORATORISTA' or request.user.rol == 'ADMINISTRADOR' %}
+                        <!-- MENÚ EXCLUSIVO LABORATORISTA / ADMINISTRADOR (Req. 1.1.2) -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/usuarios/inicio/">Ventanilla / Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'bandeja_solicitudes' %}active{% endif %}"
+                               href="{% url 'reservas:bandeja_solicitudes' %}">
+                                Solicitudes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'registrar_prestamo' %}active{% endif %}"
+                               href="{% url 'reservas:registrar_prestamo' %}">
+                                Registrar préstamo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'reporte_prestamos' %}active{% endif %}"
+                               href="{% url 'reservas:reporte_prestamos' %}">
+                                Reporte de préstamos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'reportes_mensuales' %}active{% endif %}"
+                               href="{% url 'reservas:reportes_mensuales' %}">
+                                Reportes mensuales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'devoluciones' %}active{% endif %}"
+                               href="{% url 'reservas:devoluciones' %}">
+                                Devoluciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventario:gestion' %}">Inventario</a>
+                        </li>
+                        {% if request.user.rol == 'ADMINISTRADOR' %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'adeudos' %}active{% endif %}"
+                                   href="{% url 'reservas:adeudos' %}">Adeudos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'padron_usuarios' %}">Usuarios</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'mi_cuenta' %}">Mi cuenta</a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <!-- Usuario activo en sesión y Cerrar Sesión -->
+                <div class="d-flex align-items-center">
+                    <span class="text-white me-3 small">
+                        Hola, <strong>{{ request.user.first_name|default:request.user.boleta_credencial }}</strong>
+                        ({{ request.user.get_rol_display }})
+                    </span>
+                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Visualización permanente del horario operativo institucional (Req. 3.4.2) -->
+    <div class="banner-horario text-center py-1 px-3">
+        Horario operativo del laboratorio: <strong>Lunes a Viernes de 07:00 a 22:00 hrs</strong> (Sábados y domingos cerrado).
+    </div>
+
+    <!-- Contenido principal de cada vista -->
+    <main class="container mt-4 mb-5">
+        {% if request.resolver_match.url_name == 'bandeja_solicitudes' or request.resolver_match.url_name == 'mis_reservas' or request.resolver_match.url_name == 'devoluciones' or request.resolver_match.url_name == 'registrar_prestamo' or request.resolver_match.url_name == 'reporte_prestamos' or request.resolver_match.url_name == 'adeudos' %}
+            {% include "shared/back_button.html" with fallback_url="/usuarios/inicio/" %}
+        {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Pie de página institucional -->
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+    {% if request.user.rol == 'ADMINISTRADOR' %}
+        {% include "reservas/admin_notifications.html" %}
+    {% endif %}
+    {% include "shared/session_timeout.html" %}
+    <!-- Modal Req. 8.3.3: Aviso de cambios sin guardar -->
+    <div class="modal fade" id="modalCambiosSinGuardar" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header text-white" style="background-color: #6a1b29;">
+            <h5 class="modal-title fw-bold">Aviso del sistema</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body py-4">
+            <p class="mb-0 fs-6">Tienes cambios sin guardar. ¿Deseas salir sin guardarlos?</p>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-outline-danger" id="btnConfirmarSalida">Salir sin guardar</button>
+            <button type="button" class="btn btn-guinda" data-bs-dismiss="modal">Seguir editando</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formularios = Array.from(document.querySelectorAll('form[method="post"], form[method="POST"]'))
+            .filter(form => !form.action.includes("logout") && !form.classList.contains("sin-aviso"));
+
+        if (formularios.length === 0) return;
+
+        let hayCambiosSinGuardar = false;
+        let urlDestinoPendiente = null;
+
+        const modalElemento = document.getElementById("modalCambiosSinGuardar");
+        const modalBootstrap = new bootstrap.Modal(modalElemento);
+        const btnConfirmarSalida = document.getElementById("btnConfirmarSalida");
+
+        formularios.forEach((form) => {
+            const camposEditables = form.querySelectorAll('input:not([type="hidden"]):not([type="submit"]), select, textarea');
+            if (camposEditables.length === 0) return;
+
+            camposEditables.forEach((campo) => {
+                campo.addEventListener("input", () => { hayCambiosSinGuardar = true; });
+                campo.addEventListener("change", () => { hayCambiosSinGuardar = true; });
+            });
+
+            form.addEventListener("submit", () => { hayCambiosSinGuardar = false; });
+        });
+
+        document.querySelectorAll("a[href]").forEach((enlace) => {
+            enlace.addEventListener("click", function (e) {
+                const href = enlace.getAttribute("href");
+                if (!href || href.startsWith("#") || enlace.hasAttribute("data-bs-toggle")) return;
+
+                if (hayCambiosSinGuardar) {
+                    e.preventDefault();
+                    urlDestinoPendiente = enlace.href;
+                    modalBootstrap.show();
+                }
+            });
+        });
+
+        btnConfirmarSalida.addEventListener("click", function () {
+            hayCambiosSinGuardar = false;
+            if (urlDestinoPendiente) {
+                window.location.href = urlDestinoPendiente;
+            }
+        });
+
+        window.addEventListener("beforeunload", function (e) {
+            if (hayCambiosSinGuardar) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        });
+    });
+    </script>
+</body>
+</html>

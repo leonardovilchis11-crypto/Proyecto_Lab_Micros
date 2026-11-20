@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio de Sesión - Laboratorio de Microcontroladores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-custom { background-color: #6a1b29; color: white; } /* Guinda IPN */
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+        .card-login { margin-top: 5vh; border-top: 5px solid #6a1b29; }
+    </style>
+</head>
+<body>
+    {% include "shared/brand_logos.html" %}
+    <!-- Encabezado Institucional (REQ-8.4.2) -->
+    <nav class="navbar navbar-custom px-4 py-2">
+        <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán - Sistema de Préstamos</span>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+        <div class="card card-login shadow p-4" style="width: 400px;">
+            <h3 class="text-center mb-4" style="color: #6a1b29;">Iniciar Sesión</h3>
+            
+            {% if request.GET.inactividad == '1' %}
+                <div class="alert alert-warning" role="alert">
+                    Tu sesión se cerró automáticamente por inactividad. Inicia sesión para continuar.
+                </div>
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">Boleta o contraseña incorrecta.</div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Número de Boleta / Credencial</label>
+                    <input type="text" name="username" class="form-control" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Clave de acceso</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn w-100 text-white" style="background-color: #6a1b29;">Iniciar Sesión</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <a href="{% url 'seleccionar_registro' %}" class="text-decoration-none" style="color: #6a1b29;">¿No tienes cuenta? Regístrate aquí</a>
+                <a href="{% url 'password_reset' %}" class="d-block mt-2 small text-muted">¿Olvidaste tu contraseña?</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de página institucional (REQ-8.4.2) -->
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
+    </footer>
+{% include "shared/session_timeout.html" %}
+</body>
+</html>
+

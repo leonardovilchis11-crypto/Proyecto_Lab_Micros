@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Laboratorio de Microcontroladores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom { background-color: #6a1b29; color: white; }
+        .navbar-custom .nav-link { color: rgba(255,255,255,.9); border-radius: 6px; padding: 6px 10px; text-decoration: none; }
+        .navbar-custom .nav-link:hover, .navbar-custom .nav-link:focus { color: white; background-color: rgba(255,255,255,.16); }
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+        .card-menu { border-top: 4px solid #6a1b29; transition: transform 0.2s; }
+        .card-menu:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="bg-light pb-5">
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-custom px-4 py-2 d-flex gap-2">
+        <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán — Panel Principal</span>
+        <div class="d-flex align-items-center gap-1 me-auto">
+            {% if usuario.rol == 'ALUMNO' %}
+                <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
+                <a class="nav-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
+                <a class="nav-link" href="{% url 'reservas:carrito' %}">Carrito</a>
+                <a class="nav-link" href="{% url 'reservas:mis_reservas' %}">Mis reservas</a>
+            {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
+                <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
+                <a class="nav-link" href="{% url 'reservas:bandeja_solicitudes' %}">Solicitudes</a>
+                <a class="nav-link" href="{% url 'reservas:devoluciones' %}">Devoluciones</a>
+                <a class="nav-link" href="{% url 'reservas:reportes_mensuales' %}">Reportes mensuales</a>
+                <a class="nav-link" href="{% url 'inventario:gestion' %}">Inventario</a>
+                {% if usuario.rol == 'ADMINISTRADOR' %}
+                    <a class="nav-link" href="{% url 'reservas:adeudos' %}">Adeudos</a>
+                    <a class="nav-link" href="{% url 'padron_usuarios' %}">Usuarios</a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="text-white me-3">
+                Hola, {{ usuario.first_name|default:usuario.boleta_credencial }} ({{ usuario.get_rol_display }})
+            </span>
+            <form action="{% url 'logout' %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="bg-warning-subtle border-bottom text-center py-1 small text-dark">
+        Horario operativo del laboratorio: <strong>Lunes a Viernes de 07:00 a 22:00 hrs</strong>
+    </div>
+    <div class="container mt-5 mb-5">
+        {% if usuario.rol == 'ALUMNO' %}
+            <div id="alertas-prestamo" aria-live="polite"></div>
+            {{ loan_alerts|json_script:"alertas-prestamo-data" }}
+        {% endif %}
+        {% if usuario.rol == 'ADMINISTRADOR' or usuario.rol == 'LABORATORISTA' %}
+            {% if admin_summary %}
+            <h3 class="mb-3" style="color: #6a1b29;">Resumen del laboratorio</h3>
+            <div class="row g-3 mb-5">
+                <div class="col-md-3">
+                    <a href="{% url 'reservas:reporte_prestamos' %}?estatus=ACTIVO" class="text-decoration-none">
+                        <div class="card card-menu shadow-sm h-100 p-3">
+                            <span class="badge text-bg-warning align-self-start">En curso</span>
+                            <h5 class="mt-2">Préstamos activos</h5>
+                            <div class="display-6 fw-bold text-dark">{{ admin_summary.prestamos_activos }}</div>
+                            <small class="text-muted mt-auto">Ver detalle de préstamos activos</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'reservas:reporte_prestamos' %}?estatus=VENCIDO" class="text-decoration-none">
+                        <div class="card card-menu shadow-sm h-100 p-3">
+                            <span class="badge text-bg-danger align-self-start">Atención</span>
+                            <h5 class="mt-2">Préstamos vencidos</h5>
+                            <div class="display-6 fw-bold text-dark">{{ admin_summary.prestamos_vencidos }}</div>
+                            <small class="text-muted mt-auto">Ver vencimientos y adeudos</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'reservas:bandeja_solicitudes' %}" class="text-decoration-none">
+                        <div class="card card-menu shadow-sm h-100 p-3">
+                            <span class="badge text-bg-info align-self-start">Pendiente</span>
+                            <h5 class="mt-2">Solicitudes pendientes</h5>
+                            <div class="display-6 fw-bold text-dark">{{ admin_summary.solicitudes_pendientes }}</div>
+                            <small class="text-muted mt-auto">Abrir bandeja de solicitudes</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'inventario:gestion' %}?estatus=MANTENIMIENTO" class="text-decoration-none">
+                        <div class="card card-menu shadow-sm h-100 p-3">
+                            <span class="badge text-bg-danger align-self-start">Fuera de servicio</span>
+                            <h5 class="mt-2">Equipos en mantenimiento</h5>
+                            <div class="display-6 fw-bold text-dark">{{ admin_summary.equipos_mantenimiento }}</div>
+                            <small class="text-muted mt-auto">Ver equipo en mantenimiento</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
+        <h3 class="mb-4" style="color: #6a1b29;">Accesos Rápidos del Sistema</h3>
+        <div class="row g-4">
+
+            <!-- Pantalla 12: Mi Cuenta (Común para todos los perfiles) -->
+            <div class="col-md-4">
+                <div class="card card-menu shadow-sm h-100 p-3">
+                    <h5>Mi Cuenta y Estatus</h5>
+                    <p class="text-muted small">Consulta tus datos institucionales, semáforo de estatus y cambio de clave.</p>
+                    <a href="{% url 'mi_cuenta' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ir a Mi Cuenta</a>
+                </div>
+            </div>
+
+            {% if usuario.rol == 'ALUMNO' %}
+                <!-- ================= SECCIÓN EXCLUSIVA ALUMNO ================= -->
+
+                <!-- Pantalla 4: Catálogo -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Catálogo de Material y Equipos</h5>
+                        <p class="text-muted small">Consulta la disponibilidad en tiempo real de microcontroladores, sensores e instrumentos.</p>
+                        <a href="{% url 'catalogo:lista' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ver Catálogo</a>
+                    </div>
+                </div>
+
+                <!-- Pantalla 14: Carrito de Solicitudes (Módulo Reservas) -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5>Carrito de Solicitudes</h5>
+                            <span class="badge rounded-pill text-bg-dark">
+                                {{ request.session.carrito_solicitud|length }}
+                            </span>
+                        </div>
+                        <p class="text-muted small">Revisa los componentes agregados, ajusta cantidades, elige fecha/horario y confirma tu reserva.</p>
+                        <a href="{% url 'reservas:carrito' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Abrir Carrito</a>
+                    </div>
+                </div>
+
+                <!-- Pantalla 15: Mis Reservas y Préstamos (Módulo Reservas) -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Mis Reservas y Préstamos</h5>
+                        <p class="text-muted small">Consulta tus reservas pendientes, cancélalas antes del bloque o revisa tus préstamos activos.</p>
+                        <a href="{% url 'reservas:mis_reservas' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ver Mis Reservas</a>
+                    </div>
+                </div>
+
+            {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
+                <!-- ================= SECCIÓN EXCLUSIVA OPERADORES / ADMIN ================= -->
+
+                <!-- Pantalla 6: Bandeja de Solicitudes y Reservas (Módulo Reservas) -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Bandeja de Solicitudes y Reservas</h5>
+                        <p class="text-muted small">Atiende en ventanilla las solicitudes y reservas pendientes enviadas por los alumnos.</p>
+                        <a href="{% url 'reservas:bandeja_solicitudes' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Abrir Bandeja</a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Registro de préstamo</h5>
+                        <p class="text-muted small">Valida al alumno, selecciona equipos disponibles y genera su comprobante de entrega.</p>
+                        <a href="{% url 'reservas:registrar_prestamo' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Registrar préstamo</a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Reporte de préstamos</h5>
+                        <p class="text-muted small">Consulta entregas, límites de devolución y estatus de cada equipo prestado.</p>
+                        <a href="{% url 'reservas:reporte_prestamos' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Abrir reporte</a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Reportes mensuales</h5>
+                        <p class="text-muted small">Consulta y abre los reportes mensuales de inventario en PDF.</p>
+                        <a href="{% url 'reservas:reportes_mensuales' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ver reportes</a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Devolución de equipos</h5>
+                        <p class="text-muted small">Busca el préstamo por boleta y registra el estado de cada pieza recibida.</p>
+                        <a href="{% url 'reservas:devoluciones' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Registrar devolución</a>
+                    </div>
+                </div>
+
+                <!-- Pantallas 13 y 18: Inventario -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Gestión de Inventario</h5>
+                        <p class="text-muted small">Control de existencias del laboratorio, alta de nuevo material, bajas y mantenimiento.</p>
+                        <div class="d-grid gap-2 mt-auto">
+                            <a href="{% url 'inventario:gestion' %}" class="btn text-white" style="background-color: #6a1b29;">Inventario General</a>
+                            <a href="{% url 'inventario:nuevo' %}" class="btn btn-outline-dark btn-sm">+ Registrar Nuevo Equipo</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pantalla 4: Consulta de Catálogo -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Catálogo de Material y Equipos</h5>
+                        <p class="text-muted small">Consulta la disponibilidad y ubicación física de los equipos del laboratorio.</p>
+                        <a href="{% url 'catalogo:lista' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ver Catálogo</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if usuario.rol == 'ADMINISTRADOR' %}
+                <!-- Pantalla 7 y 3: Solo Administrador -->
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Padrón y Personal</h5>
+                        <p class="text-muted small">Administra cuentas de alumnos, da de alta laboratoristas y gestiona bajas.</p>
+                        <div class="d-grid gap-2 mt-auto">
+                            <a href="{% url 'padron_usuarios' %}" class="btn text-white" style="background-color: #6a1b29;">Padrón de Usuarios</a>
+                            <a href="{% url 'registrar_personal' %}" class="btn btn-outline-dark btn-sm">Alta de Personal Operativo</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Adeudos y reposiciones</h5>
+                        <p class="text-muted small">Consulta reportes de daños, adeudos activos y registra pagos o reposiciones.</p>
+                        <a href="{% url 'reservas:adeudos' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Abrir Adeudos</a>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
+    </footer>
+{% if usuario.rol == 'ALUMNO' %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dataElement = document.getElementById("alertas-prestamo-data");
+    const container = document.getElementById("alertas-prestamo");
+    if (!dataElement || !container) return;
+
+    const prestamos = JSON.parse(dataElement.textContent);
+    const alertas = new Map();
+
+    function mostrarAlerta(prestamo, vencido) {
+        let alerta = alertas.get(prestamo.id);
+        if (!alerta) {
+            alerta = document.createElement("div");
+            alerta.className = "alert shadow-sm";
+            alerta.dataset.prestamoId = prestamo.id;
+            alertas.set(prestamo.id, alerta);
+            container.appendChild(alerta);
+        }
+        alerta.className = vencido ? "alert alert-danger shadow-sm" : "alert alert-warning shadow-sm";
+        alerta.textContent = vencido
+            ? "Préstamo vencido: devuelve " + prestamo.material + " (" + prestamo.id_material + ")."
+            : "Tu préstamo de " + prestamo.material + " vence en 15 minutos. Organiza su devolución.";
+    }
+
+    const ahora = Date.now();
+    prestamos.forEach(function (prestamo) {
+        const aviso = Date.parse(prestamo.fecha_aviso);
+        const limite = Date.parse(prestamo.fecha_limite);
+        if (ahora >= limite) {
+            mostrarAlerta(prestamo, true);
+        } else if (ahora >= aviso) {
+            mostrarAlerta(prestamo, false);
+        } else {
+            window.setTimeout(function () {
+                mostrarAlerta(prestamo, false);
+            }, aviso - ahora);
+        }
+        if (ahora < limite) {
+            window.setTimeout(function () {
+                mostrarAlerta(prestamo, true);
+            }, limite - ahora);
+        }
+    });
+});
+</script>
+{% endif %}
+{% if usuario.rol == 'ADMINISTRADOR' %}
+    {% include "reservas/admin_notifications.html" %}
+{% endif %}
+{% include "shared/session_timeout.html" %}
+</body>
+</html>

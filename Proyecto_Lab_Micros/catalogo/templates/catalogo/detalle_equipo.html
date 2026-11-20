@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ficha de Detalle — {{ equipo.nombre }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 15px; background-color: #f5f5f5; padding-top: 56px; padding-bottom: 60px; }
+        .navbar-custom { background-color: #6a1b29; color: white; position: fixed; top: 0; width: 100%; z-index: 1030; }
+        .footer-custom { background-color: #333333; color: white; position: fixed; bottom: 0; width: 100%; z-index: 1030; }
+        .logo-badge { background-color: #ffffff; color: #6a1b29; font-weight: 800; padding: 4px 10px; border-radius: 4px; margin-right: 10px; }
+        .semaforo-verde { background-color: #198754; color: #fff; }
+        .semaforo-amarillo { background-color: #ffc107; color: #000; }
+        .semaforo-rojo { background-color: #dc3545; color: #fff; }
+        .foto-equipo-box { background: linear-gradient(135deg, #6a1b29 0%, #3d0f17 100%); color: white; border-radius: 8px; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body class="fixed-brand-layout">
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-custom px-4 py-2 shadow-sm">
+        <div class="d-flex align-items-center">
+            <span class="navbar-brand mb-0 h1 text-white fs-5">Ficha Técnica del Equipo — Laboratorio de Microprocesadores</span>
+        </div>
+        {% include "shared/role_navigation.html" %}
+        <!-- Req. 2.0.2 Botón Regresar al catálogo conservando la búsqueda y filtros aplicados -->
+        <a href="{% url 'catalogo:lista' %}?q={{ q }}&categoria={{ categoria }}&disponibilidad={{ disponibilidad }}" class="btn btn-outline-light btn-sm">
+            ← Regresar al catálogo
+        </a>
+    </nav>
+
+    <div class="container mt-4 mb-5">
+        <div class="card shadow-sm border-0 p-4">
+            <div class="row g-4">
+                <!-- Fotografía / Ilustración representativa del equipo -->
+                <div class="col-md-4">
+                    <div class="foto-equipo-box shadow-sm">
+                        <div style="font-size: 3.5rem;">🔌</div>
+                        <h6 class="mt-2 mb-1">{{ equipo.categoria }}</h6>
+                        <span class="badge bg-light text-dark mt-1">ID: {{ equipo.id_unico }}</span>
+                    </div>
+                </div>
+
+                <!-- Datos técnicos, ubicación, semáforo y botón Agregar (Req. 2.0.2) -->
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <h3 style="color: #6a1b29;" class="mb-1">{{ equipo.nombre }}</h3>
+                        {% if disponibles > 0 %}
+                            <span class="badge semaforo-verde fs-6">● Disponible ({{ disponibles }} de {{ total_unidades }} unidades)</span>
+                        {% else %}
+                            <span class="badge semaforo-rojo fs-6">● En mantenimiento / Sin unidades libres</span>
+                        {% endif %}
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p class="mb-1"><strong>Identificador Único Principal:</strong> <code>{{ equipo.id_unico }}</code></p>
+                            <p class="mb-1"><strong>Categoría:</strong> {{ equipo.categoria }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-1"><strong>Ubicación en Laboratorio:</strong> {{ equipo.estante }}, {{ equipo.cajon }}</p>
+                            <p class="mb-1"><strong>Unidades listas para préstamo:</strong> {{ disponibles }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Especificaciones Técnicas:</strong>
+                        <p class="text-secondary mt-1 mb-0">{{ equipo.especificaciones }}</p>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        {% if disponibles > 0 %}
+                            <a href="{% url 'catalogo:agregar_carrito' equipo.id %}" class="btn text-white px-4" style="background-color: #6a1b29;">
+                                + Agregar al Carrito
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary px-4" disabled>
+                                Agregar (Deshabilitado: No hay unidades disponibles en este momento)
+                            </button>
+                        {% endif %}
+                        <a href="{% url 'catalogo:lista' %}?q={{ q }}&categoria={{ categoria }}&disponibilidad={{ disponibilidad }}" class="btn btn-outline-secondary">
+                            Regresar al catálogo
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Desglose de Unidades Físicas y Calendario de Disponibilidad Semanal (Req. 2.0.2) -->
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h5 style="color: #6a1b29;">Estatus Individual por Pieza Física</h5>
+                    <table class="table table-sm table-bordered mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Único</th>
+                                <th>Ubicación</th>
+                                <th>Semáforo de Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in unidades %}
+                            <tr>
+                                <td><code>{{ u.id_unico }}</code></td>
+                                <td>{{ u.estante }} - {{ u.cajon }}</td>
+                                <td>
+                                    {% if u.estatus == 'DISPONIBLE' %}
+                                        <span class="badge semaforo-verde">● Disponible (Buen estado)</span>
+                                    {% elif u.estatus == 'PRESTADO' %}
+                                        <span class="badge semaforo-amarillo">● Prestado</span>
+                                    {% else %}
+                                        <span class="badge semaforo-rojo">● En mantenimiento / Dañado</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <h5 style="color: #6a1b29;">Calendario de Disponibilidad del Equipo (Lunes a Viernes)</h5>
+                    <table class="table table-sm table-bordered text-center mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Bloque Horario</th>
+                                <th>Lun</th>
+                                <th>Mar</th>
+                                <th>Mié</th>
+                                <th>Jue</th>
+                                <th>Vie</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>07:00 - 11:30</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                            </tr>
+                            <tr>
+                                <td>11:30 - 16:00</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-warning fw-bold">Alta demanda</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                            </tr>
+                            <tr>
+                                <td>16:00 - 22:00</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                                <td class="text-success fw-bold">Disponible</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-custom text-center py-2">
+        <small>Instituto Politécnico Nacional — ESIME Unidad Culhuacán — Laboratorio de Microprocesadores</small>
+    </footer>
+{% include "shared/session_timeout.html" %}
+</body>
+</html>

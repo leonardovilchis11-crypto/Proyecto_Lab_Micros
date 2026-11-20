@@ -1,0 +1,50 @@
+{% load static %}
+<div class="institutional-logos" aria-label="Logotipos institucionales">
+    <img src="{% static 'usuarios/img/logo-ipn.png' %}" alt="Logotipo del IPN" class="institutional-logo-ipn">
+    <img src="{% static 'usuarios/img/logo-esime.png' %}" alt="Logotipo de ESIME" class="institutional-logo-esime">
+</div>
+<style>
+    :root {
+        --institutional-logo-height: 56px;
+    }
+    .institutional-logos {
+        position: relative;
+        width: 100%;
+        height: 56px;
+        padding: 4px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #fff;
+        border-bottom: 1px solid #e9ecef;
+        pointer-events: none;
+    }
+    .institutional-logos img {
+        object-fit: contain;
+    }
+    .institutional-logo-ipn {
+        width: 32px;
+        height: 46px;
+    }
+    .institutional-logo-esime {
+        width: 64px;
+        height: 46px;
+    }
+    body.fixed-brand-layout {
+        padding-top: calc(var(--institutional-logo-height) * 2 + 8px) !important;
+    }
+    body.fixed-brand-layout > .institutional-logos {
+        position: fixed;
+        z-index: 1040;
+        top: 0;
+        left: 0;
+    }
+    body.fixed-brand-layout > nav.navbar {
+        top: var(--institutional-logo-height) !important;
+    }
+    @media print {
+        .institutional-logos {
+            display: none;
+        }
+    }
+</style>

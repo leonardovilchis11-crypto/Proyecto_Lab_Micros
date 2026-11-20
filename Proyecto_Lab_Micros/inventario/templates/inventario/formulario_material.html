@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Alta de Materiales y Códigos de Barras — Inventario{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-form { border-top: 4px solid #6a1b29; }
+    .barcode-box { border: 1px dashed #333; padding: 12px; text-align: center; background: #fff; border-radius: 6px; }
+    .barcode-bars { font-family: 'Courier New', monospace; letter-spacing: 3px; font-weight: 900; font-size: 1.3rem; }
+    @media print { .no-print, nav, footer { display: none !important; } body { background: #fff; } }
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-ipn px-4 py-2 shadow-sm no-print">
+        <div class="d-flex align-items-center">
+            <span class="navbar-brand mb-0 h1 text-white fs-5">Registro de Nuevos Materiales</span>
+        </div>
+        {% include "shared/role_navigation.html" %}
+        <a href="{% url 'inventario:gestion' %}" class="btn btn-outline-light btn-sm">Volver al Inventario</a>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        {% if error_msg %}
+        <div class="alert alert-danger">{{ error_msg }}</div>
+        {% endif %}
+
+        {% if ids_generados %}
+        <div class="card card-form shadow-sm p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0 text-success">¡Lote registrado! IDs únicos asignados automáticamente ({{ ids_generados|length }} unidades)</h4>
+                <button onclick="window.print()" class="btn btn-guinda no-print">
+                    🖨️ Imprimir / Descargar códigos de barras
+                </button>
+            </div>
+            <p class="text-muted small no-print">Cada unidad física recibió un identificador exclusivo para su rastreo individual en préstamos y devoluciones con lector óptico.</p>
+            <div class="row g-3">
+                {% for pieza in ids_generados %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="barcode-box">
+                        <div class="small fw-bold text-truncate">{{ pieza.nombre }}</div>
+                        <div class="barcode-bars my-1">||| || |||| ||| || ||||</div>
+                        <div><code><strong>{{ pieza.id_unico }}</strong></code></div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{ pieza.estante }} - {{ pieza.cajon }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="mt-3 text-end no-print">
+                <a href="{% url 'inventario:gestion' %}" class="btn btn-outline-dark">Ir a la Tabla de Inventario</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulario de Alta de Materiales (Req. 2.1.1) -->
+        <div class="card card-form shadow-sm p-4 no-print">
+            <h4 class="mb-3" style="color: #6a1b29;">Formulario de Alta de Materiales y Equipos</h4>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Descripción del Material o Equipo <span class="text-danger">*</span></label>
+                        <input type="text" name="descripcion" class="form-control" value="{{ datos.descripcion|default:'' }}" placeholder="Ej. Juego de Cables Caimán-Caimán / Fuente de Poder DC 30V" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Cantidad de unidades <span class="text-danger">*</span></label>
+                        <input type="number" name="cantidad" class="form-control" value="{{ datos.cantidad|default:1 }}" min="1" max="50" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Categoría</label>
+                        <select name="categoria" class="form-select">
+                            {% for cat in categorias %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Número de Estante</label>
+                        <input type="text" name="estante" class="form-control" value="{{ datos.estante|default:'Estante A' }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Número de Cajón</label>
+                        <input type="text" name="cajon" class="form-control" value="{{ datos.cajon|default:'Cajón 1' }}" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Especificaciones Técnicas</label>
+                    <textarea name="especificaciones" class="form-control" rows="2" placeholder="Ej. Longitud 50cm, puntas aisladas / Salida regulada 0-30V 5A...">{{ datos.especificaciones|default:'' }}</textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'inventario:gestion' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-guinda">Guardar y Generar IDs Únicos</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {% include "shared/session_timeout.html" %}
+{% endblock %}

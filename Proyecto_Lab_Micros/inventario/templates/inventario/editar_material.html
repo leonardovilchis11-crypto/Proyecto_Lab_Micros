@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Edición de Estado y Ubicación — {{ material.id_unico }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .semaforo-verde { background-color: #198754; color: #fff; }
+    .semaforo-amarillo { background-color: #ffc107; color: #000; }
+    .semaforo-rojo { background-color: #dc3545; color: #fff; }
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-ipn px-4 py-2 shadow-sm">
+        <div class="d-flex align-items-center">
+            <span class="navbar-brand mb-0 h1 text-white fs-5">Edición de Equipo y Baja de Inventario</span>
+        </div>
+        {% include "shared/role_navigation.html" %}
+        <a href="{% url 'inventario:gestion' %}" class="btn btn-outline-light btn-sm">Volver al Inventario</a>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h4 class="mb-1" style="color: #6a1b29;">{{ material.nombre }} (<code>{{ material.id_unico }}</code>)</h4>
+            <span class="text-muted small">Categoría: {{ material.categoria }} | Ubicación actual: {{ material.estante }}, {{ material.cajon }}</span>
+        </div>
+        <div>
+            {% if material.estatus == 'DISPONIBLE' %}
+                <span class="badge semaforo-verde fs-6">● Disponible (Buen estado)</span>
+            {% elif material.estatus == 'PRESTADO' %}
+                <span class="badge semaforo-amarillo fs-6">● Prestado</span>
+            {% else %}
+                <span class="badge semaforo-rojo fs-6">● En mantenimiento / Dañado</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if error_msg %}
+<div class="alert alert-danger">{{ error_msg }}</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- 1) Modificar ubicación física -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-0 p-3">
+            <h5 style="color: #6a1b29;">1. Ubicación Física</h5>
+            <p class="small text-muted">Actualiza el estante y cajón asignados dentro del almacén del laboratorio.</p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="tipo_accion" value="ubicacion">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Número de Estante</label>
+                    <input type="text" name="estante" class="form-control" value="{{ material.estante }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Número de Cajón / Gaveta</label>
+                    <input type="text" name="cajon" class="form-control" value="{{ material.cajon }}" required>
+                </div>
+                <button type="submit" class="btn btn-guinda w-100">Actualizar Ubicación</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2) Cambiar estatus -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-0 p-3">
+            <h5 style="color: #6a1b29;">2. Estado Operativo</h5>
+            <p class="small text-muted">Cambia un equipo de "En mantenimiento" a "Disponible" tras su reparación, registrando la observación.</p>
+            <form method="post" id="formEstatus">
+                {% csrf_token %}
+                <input type="hidden" name="tipo_accion" value="estatus">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Nuevo Estatus del Semáforo</label>
+                    <select name="nuevo_estatus" class="form-select">
+                        <option value="DISPONIBLE" {% if material.estatus == 'DISPONIBLE' %}selected{% endif %}>🟢 Disponible (Reparado / Buen estado)</option>
+                        <option value="MANTENIMIENTO" {% if material.estatus == 'MANTENIMIENTO' %}selected{% endif %}>🔴 En mantenimiento (Revisión técnica)</option>
+                        <option value="DANADO" {% if material.estatus == 'DANADO' %}selected{% endif %}>🔴 Dañado (Con falla reportada)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Observación Técnica Obligatoria <span class="text-danger">*</span></label>
+                    <textarea name="observaciones" class="form-control" rows="2" placeholder="Ej. Se reemplazó fusible y se calibró canal..." required>{{ material.observaciones }}</textarea>
+                </div>
+                <button type="button" class="btn btn-outline-dark w-100" onclick="abrirModalConfirmacion('formEstatus')">
+                    Cambiar Estatus Operativo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3) Dar de Baja Definitiva -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-danger p-3">
+            <h5 class="text-danger">3. Baja Definitiva</h5>
+            <p class="small text-muted">Retira permanentemente la pieza de las vistas de disponibilidad conservando su historial en la base de datos.</p>
+            <form method="post" id="formBaja">
+                {% csrf_token %}
+                <input type="hidden" name="tipo_accion" value="baja">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Motivo de la Baja Definitiva <span class="text-danger">*</span></label>
+                    <select name="motivo_baja" class="form-select" required>
+                        <option value="">Seleccione un motivo...</option>
+                        <option value="Componente quemado sin reparación">Componente quemado sin reparación</option>
+                        <option value="Daño físico severo / Irreparable">Daño físico severo / Irreparable</option>
+                        <option value="Obsolescencia tecnológica">Obsolescencia tecnológica</option>
+                        <option value="Extravío dictaminado con acta">Extravío dictaminado con acta</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-danger w-100 mt-4" onclick="abrirModalConfirmacion('formBaja')">
+                    Procesar Baja Definitiva
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Req. 4.1.1 -->
+<div class="modal fade" id="modalConfirmacionSRS" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: #6a1b29;">
+                <h5 class="modal-title">Confirmación de Acción</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="fs-5 mb-0">¿Estás seguro de que deseas realizar esta acción?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-guinda px-4" id="btnConfirmarModal">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let formularioPendienteId = null;
+    function abrirModalConfirmacion(formId) {
+        const form = document.getElementById(formId);
+        if (!form.reportValidity()) return;
+        formularioPendienteId = formId;
+        const modal = new bootstrap.Modal(document.getElementById('modalConfirmacionSRS'));
+        modal.show();
+    }
+    document.getElementById('btnConfirmarModal').addEventListener('click', function () {
+        if (formularioPendienteId) {
+            const form = document.getElementById(formularioPendienteId);
+            form.dispatchEvent(new Event('submit'));
+            form.submit();
+        }
+    });
+</script>
+{% include "shared/session_timeout.html" %}
+{% endblock %} 

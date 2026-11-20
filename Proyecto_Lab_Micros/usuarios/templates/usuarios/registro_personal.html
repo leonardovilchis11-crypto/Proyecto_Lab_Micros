@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Alta de Personal - ESIME{% endblock %}
+
+{% block navbar %}
+    {% include "shared/brand_logos.html" %}
+    <nav class="navbar navbar-ipn px-4 py-2">
+        <span class="navbar-brand mb-0 h1 text-white">Administración — Alta de Personal</span>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">Volver al Inicio</a>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5" style="max-width: 500px;">
+    <div class="card shadow p-4 border-top border-4" style="border-color: #6a1b29 !important;">
+        <h4 class="text-center mb-3" style="color: #6a1b29;">Registrar Personal Operativo</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-guinda w-100 mt-3">Guardar Personal</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="{% url 'dashboard' %}" class="text-decoration-none text-secondary">Cancelar y regresar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {% include "shared/session_timeout.html" %}
+{% endblock %}
+

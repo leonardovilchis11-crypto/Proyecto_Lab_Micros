@@ -1,0 +1,68 @@
+<div id="notificaciones-admin" class="notificaciones-admin" aria-live="polite"></div>
+<style>
+    .notificaciones-admin {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1090;
+        width: min(24rem, calc(100vw - 2rem));
+    }
+    .notificacion-admin {
+        box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .18);
+    }
+</style>
+<script>
+(function () {
+    const container = document.getElementById("notificaciones-admin");
+    const endpoint = "{% url 'reservas:notificaciones_admin' %}";
+    let conocidas = null;
+    let errorMostrado = false;
+
+    function mostrar(mensaje, error) {
+        const toast = document.createElement("div");
+        toast.className = "alert " + (error ? "alert-danger" : "alert-info") + " alert-dismissible fade show notificacion-admin";
+        toast.setAttribute("role", "status");
+        const texto = document.createElement("span");
+        texto.textContent = mensaje;
+        const cerrar = document.createElement("button");
+        cerrar.type = "button";
+        cerrar.className = "btn-close";
+        cerrar.setAttribute("aria-label", "Cerrar");
+        cerrar.addEventListener("click", function () { toast.remove(); });
+        toast.append(texto, cerrar);
+        container.appendChild(toast);
+        window.setTimeout(function () { toast.remove(); }, 9000);
+    }
+
+    async function consultar() {
+        try {
+            const respuesta = await fetch(endpoint, {
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                cache: "no-store"
+            });
+            if (!respuesta.ok) throw new Error("HTTP " + respuesta.status);
+            const datos = await respuesta.json();
+            const actuales = new Map(datos.eventos.map(function (evento) {
+                return [evento.id, evento];
+            }));
+
+            if (conocidas !== null) {
+                actuales.forEach(function (evento, id) {
+                    if (!conocidas.has(id)) mostrar(evento.mensaje, false);
+                });
+            }
+            conocidas = new Set(actuales.keys());
+            errorMostrado = false;
+        } catch (error) {
+            console.error("No se pudieron consultar las notificaciones administrativas.", error);
+            if (!errorMostrado) {
+                mostrar("No se pudieron actualizar las notificaciones en vivo.", true);
+                errorMostrado = true;
+            }
+        }
+    }
+
+    consultar();
+    window.setInterval(consultar, 15000);
+})();
+</script>

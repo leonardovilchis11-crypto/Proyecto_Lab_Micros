@@ -1,0 +1,47 @@
+{% extends "reservas/base_reservas.html" %}
+
+{% block title %}Reportes mensuales | ESIME Culhuacán{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h2 class="h4 fw-bold mb-1" style="color: var(--ipn-guinda);">Reportes mensuales</h2>
+        <p class="text-muted mb-0">Reportes consolidados de inventario disponibles en PDF.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Volver al inicio</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    {% if reportes %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Periodo</th>
+                    <th>Archivo</th>
+                    <th class="text-end pe-3">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in reportes %}
+                <tr>
+                    <td class="ps-3 fw-semibold">{{ reporte.periodo }}</td>
+                    <td>{{ reporte.nombre }}</td>
+                    <td class="text-end pe-3">
+                        <a class="btn btn-outline-dark btn-sm"
+                           href="{% url 'reservas:reporte_mensual_pdf' reporte.nombre %}"
+                           target="_blank" rel="noopener">Ver PDF</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="fs-5 fw-semibold text-muted mb-2">Aún no hay reportes mensuales</p>
+        <p class="text-muted mb-0">Cuando se genere un reporte PDF, aparecerá aquí.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

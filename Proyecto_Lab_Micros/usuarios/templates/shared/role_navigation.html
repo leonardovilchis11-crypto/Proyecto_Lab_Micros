@@ -1,0 +1,30 @@
+<div class="role-navigation d-flex flex-wrap align-items-center gap-1 mx-lg-3">
+    {% if request.user.rol == 'ALUMNO' %}
+        <a class="nav-link text-white px-2 py-1" href="{% url 'dashboard' %}">Inicio</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'catalogo:lista' %}">Catálogo</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:carrito' %}">Carrito</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:mis_reservas' %}">Mis reservas</a>
+    {% elif request.user.rol == 'LABORATORISTA' or request.user.rol == 'ADMINISTRADOR' %}
+        <a class="nav-link text-white px-2 py-1" href="{% url 'dashboard' %}">Inicio</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:bandeja_solicitudes' %}">Solicitudes</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:registrar_prestamo' %}">Registrar préstamo</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:reporte_prestamos' %}">Reporte de préstamos</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:reportes_mensuales' %}">Reportes mensuales</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:devoluciones' %}">Devoluciones</a>
+        <a class="nav-link text-white px-2 py-1" href="{% url 'inventario:gestion' %}">Inventario</a>
+        {% if request.user.rol == 'ADMINISTRADOR' %}
+            <a class="nav-link text-white px-2 py-1" href="{% url 'reservas:adeudos' %}">Adeudos</a>
+            <a class="nav-link text-white px-2 py-1" href="{% url 'padron_usuarios' %}">Usuarios</a>
+        {% endif %}
+    {% endif %}
+</div>
+<style>
+    .role-navigation .nav-link {
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+    .role-navigation .nav-link:hover,
+    .role-navigation .nav-link:focus {
+        background-color: rgba(255,255,255,.16);
+    }
+</style>
