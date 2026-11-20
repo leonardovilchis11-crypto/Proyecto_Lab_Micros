@@ -6,17 +6,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from .models import Usuario
-from .forms import RegistroAlumnoForm, RegistroPersonalForm
+from .forms import RegistroAlumnoForm, RegistroPersonalForm, RegistroLaboratoristaPublicoForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import RegistroAlumnoForm, RegistroPersonalForm, RegistroLaboratoristaPublicoForm
 from django.contrib import messages
 from reservas.models import Adeudo, SolicitudPrestamo
 from reservas.services import sincronizar_adeudos
-
 
 
 def registrar_alumno(request):
@@ -33,6 +31,7 @@ def registrar_alumno(request):
         form = RegistroAlumnoForm()
     return render(request, 'usuarios/registro_alumno.html', {'form': form})
 
+
 @login_required
 def mi_cuenta(request):
     usuario = Usuario.objects.get(pk=request.user.pk)
@@ -42,7 +41,6 @@ def mi_cuenta(request):
         usuario.refresh_from_db(fields=['estatus'])
 
     return render(request, 'usuarios/mi_cuenta.html', {'usuario': usuario})
-
 
 
 def _motivos_bloqueo_eliminacion(usuario_objetivo):
@@ -110,6 +108,7 @@ def padron_usuarios(request):
             )
 
     return render(request, 'usuarios/padron_usuarios.html', {'usuarios': usuarios, 'query': query})
+
 
 @login_required
 @user_passes_test(lambda u: u.rol == Usuario.Rol.ADMINISTRADOR)
@@ -228,8 +227,6 @@ def registrar_personal(request):
         form = RegistroPersonalForm()
     return render(request, 'usuarios/registro_personal.html', {'form': form})
 
-@login_required
-@user_passes_test(lambda u: u.rol == Usuario.Rol.ADMINISTRADOR)
 
 def solicitar_recuperacion_clave(request):
     """Paso 1 (Req. 1.1.3): Envía enlace real vía Gmail SMTP buscando en correo_institucional."""
@@ -267,6 +264,7 @@ def solicitar_recuperacion_clave(request):
 
     return render(request, 'usuarios/recuperar_clave.html')
 
+
 def seleccionar_tipo_registro(request):
     """Pantalla intermedia desde el login para elegir perfil Alumno o Laboratorista."""
     return render(request, 'usuarios/seleccionar_registro.html')
@@ -287,5 +285,3 @@ def registrar_laboratorista_publico(request):
         form = RegistroLaboratoristaPublicoForm()
     return render(request, 'usuarios/registro_laboratorista.html', {'form': form})
 
-
-            
