@@ -41,12 +41,17 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label class="form-label">Número de Boleta / Credencial</label>
-                    <input type="text" name="username" class="form-control" required autofocus>
+                    <label class="form-label" for="id_username">Número de Boleta / Credencial</label>
+                    <input type="text" name="username" id="id_username" class="form-control" required autofocus>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Clave de acceso</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <label class="form-label" for="id_password">Clave de acceso</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="id_password" class="form-control" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Mostrar u ocultar contraseña" title="Mostrar u ocultar contraseña">
+                            <span id="togglePasswordIcon">👁️</span>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn w-100 text-white" style="background-color: #6a1b29;">Iniciar Sesión</button>
             </form>
@@ -62,7 +67,21 @@
     <footer class="footer-custom text-center py-2">
         <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
     </footer>
-{% include "shared/session_timeout.html" %}
+    {% include "shared/session_timeout.html" %}
+    <script>
+        (function () {
+            const btn = document.getElementById('togglePassword');
+            const input = document.getElementById('id_password');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (!btn || !input || !icon) return;
+
+            btn.addEventListener('click', function () {
+                const esPassword = input.getAttribute('type') === 'password';
+                input.setAttribute('type', esPassword ? 'text' : 'password');
+                icon.textContent = esPassword ? '🙈' : '👁️';
+            });
+        })();
+    </script>
 </body>
 </html>
 
