@@ -1,0 +1,34 @@
+{% if request.user.is_authenticated %}
+<div class="dropdown me-2 d-inline-block">
+    <button class="btn btn-outline-light btn-sm position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notificaciones">
+        🔔
+        {% if notificaciones_no_leidas %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                {{ notificaciones_no_leidas }}
+            </span>
+        {% endif %}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifDropdown" style="min-width: 310px; max-width: 92vw; max-height: 360px; overflow-y: auto; z-index: 1050;">
+        <li class="dropdown-header fw-bold d-flex justify-content-between align-items-center">
+            <span>Notificaciones</span>
+            <span class="badge bg-secondary">{{ notificaciones_no_leidas }}</span>
+        </li>
+        <li><hr class="dropdown-divider my-1"></li>
+        {% if notificaciones %}
+            {% for n in notificaciones %}
+                <li>
+                    <div class="dropdown-item-text small border-bottom py-2">
+                        <div class="fw-semibold text-dark">{{ n.titulo }}</div>
+                        <div class="text-muted">{{ n.mensaje }}</div>
+                    </div>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li class="dropdown-item-text small text-muted py-3 text-center">
+                No tienes notificaciones nuevas.
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
