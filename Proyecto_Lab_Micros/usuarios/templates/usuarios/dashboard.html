@@ -6,61 +6,136 @@
     <title>Inicio - Laboratorio de Microcontroladores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .navbar-custom { background-color: #6a1b29; color: white; }
-        .navbar-custom .nav-link { color: rgba(255,255,255,.9); border-radius: 6px; padding: 6px 10px; text-decoration: none; }
-        .navbar-custom .nav-link:hover, .navbar-custom .nav-link:focus { color: white; background-color: rgba(255,255,255,.16); }
-        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; z-index: 100; }
-        .card-menu { border-top: 4px solid #6a1b29; transition: transform 0.2s; }
-        .card-menu:hover { transform: translateY(-5px); }
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 70px;
+            font-size: 16px;
+        }
+        .navbar-custom {
+            background-color: #6a1b29;
+            color: white;
+        }
+        .navbar-custom .nav-link {
+            color: rgba(255,255,255,.92);
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link:focus {
+            color: white;
+            background-color: rgba(255,255,255,.16);
+        }
+        .footer-custom {
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        .card-menu {
+            border-top: 4px solid #6a1b29;
+            transition: transform 0.2s;
+        }
+        .card-menu:hover {
+            transform: translateY(-4px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px;
+                padding-bottom: 76px;
+            }
+            .navbar-brand {
+                font-size: 1.05rem !important;
+                white-space: normal !important;
+            }
+            .navbar-custom .nav-link {
+                font-size: 1rem !important;
+                padding: 8px 10px !important;
+            }
+            h3 {
+                font-size: 1.35rem !important;
+            }
+            .card-menu h5 {
+                font-size: 1.15rem !important;
+            }
+            .card-menu p,
+            .card-menu small {
+                font-size: 0.95rem !important;
+            }
+            .card-menu .display-6 {
+                font-size: 2.25rem !important;
+            }
+            .btn {
+                font-size: 16px !important;
+                padding: 0.65rem 1rem !important;
+            }
+        }
     </style>
 </head>
-<body class="bg-light pb-5">
+<body class="bg-light">
     {% include "shared/brand_logos.html" %}
-    <nav class="navbar navbar-custom px-4 py-2 d-flex flex-wrap gap-2">
-        <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán — Panel Principal</span>
-        <div class="d-flex flex-wrap align-items-center gap-1 me-auto">
-            {% if usuario.rol == 'ALUMNO' %}
-                <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
-                <a class="nav-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
-                <a class="nav-link" href="{% url 'reservas:carrito' %}">Carrito</a>
-                <a class="nav-link" href="{% url 'reservas:mis_reservas' %}">Mis reservas</a>
-            {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
-                <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
-                <a class="nav-link" href="{% url 'reservas:bandeja_solicitudes' %}">Solicitudes</a>
-                <a class="nav-link" href="{% url 'reservas:devoluciones' %}">Devoluciones</a>
-                <a class="nav-link" href="{% url 'reservas:reportes_mensuales' %}">Reportes mensuales</a>
-                <a class="nav-link" href="{% url 'inventario:gestion' %}">Inventario</a>
-                {% if usuario.rol == 'ADMINISTRADOR' %}
-                    <a class="nav-link" href="{% url 'reservas:adeudos' %}">Adeudos</a>
-                    <a class="nav-link" href="{% url 'padron_usuarios' %}">Usuarios</a>
-                {% endif %}
-            {% endif %}
-        </div>
-        <div class="d-flex align-items-center">
-            <span class="text-white me-3">
-                Hola, {{ usuario.first_name|default:usuario.boleta_credencial }} ({{ usuario.get_rol_display }})
-            </span>
-            {% include "shared/notificaciones_bell.html" %}
-            <form action="{% url 'logout' %}" method="post" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
-            </form>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-3 px-md-4 py-2">
+        <div class="container-fluid">
+            <a class="navbar-brand mb-0 h1 text-white fw-bold" href="{% url 'dashboard' %}">
+                ESIME Culhuacán — Panel Principal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPanel" aria-controls="menuPanel" aria-expanded="false" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse mt-2 mt-lg-0" id="menuPanel">
+                <div class="navbar-nav me-auto gap-1">
+                    {% if usuario.rol == 'ALUMNO' %}
+                        <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
+                        <a class="nav-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
+                        <a class="nav-link" href="{% url 'reservas:carrito' %}">Carrito</a>
+                        <a class="nav-link" href="{% url 'reservas:mis_reservas' %}">Mis reservas</a>
+                    {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
+                        <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
+                        <a class="nav-link" href="{% url 'reservas:bandeja_solicitudes' %}">Solicitudes</a>
+                        <a class="nav-link" href="{% url 'reservas:devoluciones' %}">Devoluciones</a>
+                        <a class="nav-link" href="{% url 'reservas:reportes_mensuales' %}">Reportes mensuales</a>
+                        <a class="nav-link" href="{% url 'inventario:gestion' %}">Inventario</a>
+                        {% if usuario.rol == 'ADMINISTRADOR' %}
+                            <a class="nav-link" href="{% url 'reservas:adeudos' %}">Adeudos</a>
+                            <a class="nav-link" href="{% url 'padron_usuarios' %}">Usuarios</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-2 mt-lg-0">
+                    <span class="text-white small">
+                        Hola, {{ usuario.first_name|default:usuario.boleta_credencial }} ({{ usuario.get_rol_display }})
+                    </span>
+                    {% include "shared/notificaciones_bell.html" %}
+                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <div class="bg-warning-subtle border-bottom text-center py-1 small text-dark">
+    <div class="bg-warning-subtle border-bottom text-center py-2 px-2 small text-dark">
         Horario operativo del laboratorio: <strong>Lunes a Viernes de 07:00 a 22:00 hrs</strong>
     </div>
-    <div class="container mt-5 mb-5">
+
+    <div class="container my-4">
         {% if usuario.rol == 'ALUMNO' %}
             <div id="alertas-prestamo" aria-live="polite"></div>
             {{ loan_alerts|json_script:"alertas-prestamo-data" }}
         {% endif %}
+
         {% if usuario.rol == 'ADMINISTRADOR' or usuario.rol == 'LABORATORISTA' %}
             {% if admin_summary %}
             <h3 class="mb-3" style="color: #6a1b29;">Resumen del laboratorio</h3>
-            <div class="row g-3 mb-5">
-                <div class="col-md-3">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mb-4">
+                <div class="col">
                     <a href="{% url 'reservas:reporte_prestamos' %}?estatus=ACTIVO" class="text-decoration-none">
                         <div class="card card-menu shadow-sm h-100 p-3">
                             <span class="badge text-bg-warning align-self-start">En curso</span>
@@ -70,7 +145,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <a href="{% url 'reservas:reporte_prestamos' %}?estatus=VENCIDO" class="text-decoration-none">
                         <div class="card card-menu shadow-sm h-100 p-3">
                             <span class="badge text-bg-danger align-self-start">Atención</span>
@@ -80,7 +155,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <a href="{% url 'reservas:bandeja_solicitudes' %}" class="text-decoration-none">
                         <div class="card card-menu shadow-sm h-100 p-3">
                             <span class="badge text-bg-info align-self-start">Pendiente</span>
@@ -90,7 +165,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <a href="{% url 'inventario:gestion' %}?estatus=MANTENIMIENTO" class="text-decoration-none">
                         <div class="card card-menu shadow-sm h-100 p-3">
                             <span class="badge text-bg-danger align-self-start">Fuera de servicio</span>
@@ -103,11 +178,12 @@
             </div>
             {% endif %}
         {% endif %}
-        <h3 class="mb-4" style="color: #6a1b29;">Accesos Rápidos del Sistema</h3>
-        <div class="row g-4">
+
+        <h3 class="mb-3" style="color: #6a1b29;">Accesos Rápidos del Sistema</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
 
             <!-- Pantalla 12: Mi Cuenta (Común para todos los perfiles) -->
-            <div class="col-md-4">
+            <div class="col">
                 <div class="card card-menu shadow-sm h-100 p-3">
                     <h5>Mi Cuenta y Estatus</h5>
                     <p class="text-muted small">Consulta tus datos institucionales, semáforo de estatus y cambio de clave.</p>
@@ -116,10 +192,7 @@
             </div>
 
             {% if usuario.rol == 'ALUMNO' %}
-                <!-- ================= SECCIÓN EXCLUSIVA ALUMNO ================= -->
-
-                <!-- Pantalla 4: Catálogo -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Catálogo de Material y Equipos</h5>
                         <p class="text-muted small">Consulta la disponibilidad en tiempo real de microcontroladores, sensores e instrumentos.</p>
@@ -127,8 +200,7 @@
                     </div>
                 </div>
 
-                <!-- Pantalla 14: Carrito de Solicitudes (Módulo Reservas) -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <div class="d-flex justify-content-between align-items-start">
                             <h5>Carrito de Solicitudes</h5>
@@ -141,8 +213,7 @@
                     </div>
                 </div>
 
-                <!-- Pantalla 15: Mis Reservas y Préstamos (Módulo Reservas) -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Mis Reservas y Préstamos</h5>
                         <p class="text-muted small">Consulta tus reservas pendientes, cancélalas antes del bloque o revisa tus préstamos activos.</p>
@@ -151,10 +222,7 @@
                 </div>
 
             {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
-                <!-- ================= SECCIÓN EXCLUSIVA OPERADORES / ADMIN ================= -->
-
-                <!-- Pantalla 6: Bandeja de Solicitudes y Reservas (Módulo Reservas) -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Bandeja de Solicitudes y Reservas</h5>
                         <p class="text-muted small">Atiende en ventanilla las solicitudes y reservas pendientes enviadas por los alumnos.</p>
@@ -162,7 +230,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Registro de préstamo</h5>
                         <p class="text-muted small">Valida al alumno, selecciona equipos disponibles y genera su comprobante de entrega.</p>
@@ -170,7 +238,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Reporte de préstamos</h5>
                         <p class="text-muted small">Consulta entregas, límites de devolución y estatus de cada equipo prestado.</p>
@@ -178,7 +246,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Reportes mensuales</h5>
                         <p class="text-muted small">Consulta y abre los reportes mensuales de inventario en PDF.</p>
@@ -186,7 +254,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Devolución de equipos</h5>
                         <p class="text-muted small">Busca el préstamo por boleta y registra el estado de cada pieza recibida.</p>
@@ -194,8 +262,7 @@
                     </div>
                 </div>
 
-                <!-- Pantallas 13 y 18: Inventario -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Gestión de Inventario</h5>
                         <p class="text-muted small">Control de existencias del laboratorio, alta de nuevo material, bajas y mantenimiento.</p>
@@ -206,8 +273,7 @@
                     </div>
                 </div>
 
-                <!-- Pantalla 4: Consulta de Catálogo -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Catálogo de Material y Equipos</h5>
                         <p class="text-muted small">Consulta la disponibilidad y ubicación física de los equipos del laboratorio.</p>
@@ -217,8 +283,7 @@
             {% endif %}
 
             {% if usuario.rol == 'ADMINISTRADOR' %}
-                <!-- Pantalla 7 y 3: Solo Administrador -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Padrón y Personal</h5>
                         <p class="text-muted small">Administra cuentas de alumnos, da de alta laboratoristas y gestiona bajas.</p>
@@ -228,7 +293,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Adeudos y reposiciones</h5>
                         <p class="text-muted small">Consulta reportes de daños, adeudos activos y registra pagos o reposiciones.</p>
@@ -240,9 +305,10 @@
         </div>
     </div>
 
-    <footer class="footer-custom text-center py-2">
+    <footer class="footer-custom text-center py-2 px-2">
         <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
     </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% if usuario.rol == 'ALUMNO' %}
 <script>
@@ -297,4 +363,5 @@ document.addEventListener("DOMContentLoaded", function () {
 {% include "shared/session_timeout.html" %}
 </body>
 </html>
+
 
