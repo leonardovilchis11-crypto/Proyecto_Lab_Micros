@@ -57,8 +57,11 @@
 
     {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark navbar-ipn shadow-sm">
-        <div class="container">
+        <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand fw-bold" href="/">IPN | ESIME Culhuacán</a>
+            <div class="d-flex align-items-center">
+                {% include "shared/notificaciones_bell.html" %}
+            </div>
         </div>
     </nav>
     {% endblock %}
@@ -150,3 +153,4 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+
