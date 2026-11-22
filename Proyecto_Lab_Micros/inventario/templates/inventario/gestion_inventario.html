@@ -47,8 +47,8 @@
         <form method="get" class="card p-3 shadow-sm border-0 mb-4">
             <div class="row g-2 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label small fw-bold mb-1">Buscar por ID único, descripción o estante:</label>
-                    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Ej.INS-FUE-001, Osciloscopio, Estante B...">
+                    <label class="form-label small fw-bold mb-1">Buscar por ID único, descripción, estante o motivo:</label>
+                    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Ej. INS-FUE-001, Osciloscopio, Estante B...">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label small fw-bold mb-1">Categoría:</label>
@@ -62,11 +62,12 @@
                 <div class="col-md-3">
                     <label class="form-label small fw-bold mb-1">Semáforo de Estado:</label>
                     <select name="estatus" class="form-select">
-                        <option value="">Todos los estados activos</option>
+                        <option value="">Todos los estados</option>
                         <option value="DISPONIBLE" {% if estatus_sel == 'DISPONIBLE' %}selected{% endif %}>🟢 Disponible (Buen estado)</option>
                         <option value="PRESTADO" {% if estatus_sel == 'PRESTADO' %}selected{% endif %}>🟡 Prestado</option>
                         <option value="MANTENIMIENTO" {% if estatus_sel == 'MANTENIMIENTO' %}selected{% endif %}>🔴 En mantenimiento</option>
                         <option value="DANADO" {% if estatus_sel == 'DANADO' %}selected{% endif %}>🔴 Dañado</option>
+                        <option value="BAJA_DEFINITIVA" {% if estatus_sel == 'BAJA_DEFINITIVA' %}selected{% endif %}>⚫ Dado de baja</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex gap-1">
@@ -92,7 +93,7 @@
                 </thead>
                 <tbody>
                     {% for item in materiales %}
-                    <tr>
+                    <tr {% if item.estatus == 'BAJA_DEFINITIVA' or item.dado_de_baja %}class="table-secondary"{% endif %}>
                         <td><code><strong>{{ item.id_unico }}</strong></code></td>
                         <td>
                             <div class="fw-bold">{{ item.nombre }}</div>
@@ -109,8 +110,13 @@
                                 <span class="badge semaforo-rojo">● En mantenimiento</span>
                             {% elif item.estatus == 'DANADO' %}
                                 <span class="badge semaforo-rojo">● Dañado</span>
+                            {% elif item.estatus == 'BAJA_DEFINITIVA' or item.dado_de_baja %}
+                                <span class="badge bg-dark">● Dado de baja</span>
+                                <div class="small text-dark mt-1">
+                                    <strong>Motivo:</strong> {{ item.motivo_baja|default:"No especificado" }}
+                                </div>
                             {% else %}
-                                <span class="badge bg-dark">Baja definitiva ({{ item.motivo_baja }})</span>
+                                <span class="badge bg-secondary">{{ item.estatus_display|default:item.estatus }}</span>
                             {% endif %}
                             {% if item.observaciones %}
                                 <div class="small text-muted mt-1">{{ item.observaciones }}</div>
@@ -164,3 +170,4 @@
 {% include "shared/session_timeout.html" %}
 </body>
 </html>
+

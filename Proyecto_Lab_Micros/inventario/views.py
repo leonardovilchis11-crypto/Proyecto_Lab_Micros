@@ -89,15 +89,35 @@ CATEGORIAS_SISTEMA = [
     'Cables y Puntas de Prueba',
 ]
 
+ETIQUETAS_ESTATUS = {
+    'DISPONIBLE': 'Disponible',
+    'PRESTADO': 'Prestado',
+    'MANTENIMIENTO': 'En mantenimiento',
+    'DANADO': 'Dañado',
+    'BAJA_DEFINITIVA': 'Dado de baja',
+}
+
+
+def _preparar_item_vista(item):
+    copia = dict(item)
+    copia['estatus_display'] = ETIQUETAS_ESTATUS.get(item['estatus'], item['estatus'])
+    copia['dado_de_baja'] = item['estatus'] == 'BAJA_DEFINITIVA'
+    return copia
+
+
 # Pantalla 13: Tabla de Inventario General con ordenamiento, filtros y paginación (Req. 2.0, 2.3, 6.0.1)
 def gestion_inventario(request):
     query = request.GET.get('q', '').strip()
     categoria = request.GET.get('categoria', '').strip()
     estatus = request.GET.get('estatus', '').strip()
-    incluir_bajas = request.GET.get('bajas', '') == '1'
+    # Por defecto incluimos las bajas definitivas dentro del inventario para trazabilidad en Admin y Laboratorista
+    incluir_bajas = request.GET.get('bajas', '1') != '0'
 
-    # Por defecto ocultamos las Bajas Definitivas de la vista operativa (Req. 5.2)
-    materiales = [m for m in INVENTARIO_ITEMS if incluir_bajas or m['estatus'] != 'BAJA_DEFINITIVA']
+    materiales = [
+        _preparar_item_vista(m)
+        for m in INVENTARIO_ITEMS
+        if incluir_bajas or m['estatus'] != 'BAJA_DEFINITIVA'
+    ]
 
     if query:
         q_low = query.lower()
@@ -107,6 +127,7 @@ def gestion_inventario(request):
             or q_low in m['id_unico'].lower()
             or q_low in m['estante'].lower()
             or q_low in m['cajon'].lower()
+            or q_low in (m.get('motivo_baja') or '').lower()
         ]
     if categoria:
         materiales = [m for m in materiales if m['categoria'] == categoria]
@@ -125,7 +146,7 @@ def gestion_inventario(request):
         'nombre': lambda item: item['nombre'].lower(),
         'categoria': lambda item: item['categoria'].lower(),
         'ubicacion': lambda item: (item['estante'] + item['cajon']).lower(),
-        'estatus': lambda item: item['estatus'].lower(),
+        'estatus': lambda item: item['estatus_display'].lower(),
     }
     materiales.sort(key=claves_orden[orden], reverse=direccion == 'desc')
     total_registros = len(materiales)
@@ -214,7 +235,7 @@ def nuevo_material(request):
                     'motivo_baja': '',
                 }
                 INVENTARIO_ITEMS.append(nuevo_item)
-                ids_generados.append(nuevo_item)
+                ids_generados.append(_preparar_item_vista(nuevo_item))
 
     return render(request, 'inventario/formulario_material.html', {
         'categorias': CATEGORIAS_SISTEMA,
@@ -266,10 +287,11 @@ def editar_material(request, item_id):
             else:
                 material['estatus'] = 'BAJA_DEFINITIVA'
                 material['motivo_baja'] = motivo
-                request.session['mensaje_exito'] = f"El equipo {material['id_unico']} fue dado de Baja Definitiva ({motivo}). Se conserva en la BD para auditoría."
+                request.session['mensaje_exito'] = f"El equipo {material['id_unico']} fue dado de Baja Definitiva ({motivo}). Se conserva en el inventario para auditoría."
                 return redirect('inventario:gestion')
 
     return render(request, 'inventario/editar_material.html', {
-        'material': material,
+        'material': _preparar_item_vista(material),
         'error_msg': error_msg,
     })
+

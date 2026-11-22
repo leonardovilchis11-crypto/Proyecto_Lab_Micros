@@ -23,16 +23,23 @@
 
 {% block content %}
 <div class="card shadow-sm border-0 p-3 mb-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
             <h4 class="mb-1" style="color: #6a1b29;">{{ material.nombre }} (<code>{{ material.id_unico }}</code>)</h4>
             <span class="text-muted small">Categoría: {{ material.categoria }} | Ubicación actual: {{ material.estante }}, {{ material.cajon }}</span>
+            {% if material.estatus == 'BAJA_DEFINITIVA' and material.motivo_baja %}
+            <div class="small text-dark mt-1">
+                <strong>Motivo de baja:</strong> {{ material.motivo_baja }}
+            </div>
+            {% endif %}
         </div>
         <div>
             {% if material.estatus == 'DISPONIBLE' %}
                 <span class="badge semaforo-verde fs-6">● Disponible (Buen estado)</span>
             {% elif material.estatus == 'PRESTADO' %}
                 <span class="badge semaforo-amarillo fs-6">● Prestado</span>
+            {% elif material.estatus == 'BAJA_DEFINITIVA' %}
+                <span class="badge bg-dark fs-6">● Dado de baja</span>
             {% else %}
                 <span class="badge semaforo-rojo fs-6">● En mantenimiento / Dañado</span>
             {% endif %}
@@ -97,7 +104,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100 border-danger p-3">
             <h5 class="text-danger">3. Baja Definitiva</h5>
-            <p class="small text-muted">Retira permanentemente la pieza de las vistas de disponibilidad conservando su historial en la base de datos.</p>
+            <p class="small text-muted">Retira la pieza de las vistas de disponibilidad conservando su historial en el inventario como dado de baja con su motivo.</p>
             <form method="post" id="formBaja">
                 {% csrf_token %}
                 <input type="hidden" name="tipo_accion" value="baja">
@@ -105,10 +112,10 @@
                     <label class="form-label fw-bold small">Motivo de la Baja Definitiva <span class="text-danger">*</span></label>
                     <select name="motivo_baja" class="form-select" required>
                         <option value="">Seleccione un motivo...</option>
-                        <option value="Componente quemado sin reparación">Componente quemado sin reparación</option>
-                        <option value="Daño físico severo / Irreparable">Daño físico severo / Irreparable</option>
-                        <option value="Obsolescencia tecnológica">Obsolescencia tecnológica</option>
-                        <option value="Extravío dictaminado con acta">Extravío dictaminado con acta</option>
+                        <option value="Componente quemado sin reparación" {% if material.motivo_baja == 'Componente quemado sin reparación' %}selected{% endif %}>Componente quemado sin reparación</option>
+                        <option value="Daño físico severo / Irreparable" {% if material.motivo_baja == 'Daño físico severo / Irreparable' %}selected{% endif %}>Daño físico severo / Irreparable</option>
+                        <option value="Obsolescencia tecnológica" {% if material.motivo_baja == 'Obsolescencia tecnológica' %}selected{% endif %}>Obsolescencia tecnológica</option>
+                        <option value="Extravío dictaminado con acta" {% if material.motivo_baja == 'Extravío dictaminado con acta' %}selected{% endif %}>Extravío dictaminado con acta</option>
                     </select>
                 </div>
                 <button type="button" class="btn btn-danger w-100 mt-4" onclick="abrirModalConfirmacion('formBaja')">
@@ -137,6 +144,7 @@
         </div>
     </div>
 </div>
+{% include "shared/session_timeout.html" %}
 {% endblock %}
 
 {% block extra_js %}
@@ -152,10 +160,9 @@
     document.getElementById('btnConfirmarModal').addEventListener('click', function () {
         if (formularioPendienteId) {
             const form = document.getElementById(formularioPendienteId);
-            form.dispatchEvent(new Event('submit'));
             form.submit();
         }
     });
 </script>
-{% include "shared/session_timeout.html" %}
-{% endblock %} 
+{% endblock %}
+
