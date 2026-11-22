@@ -27,11 +27,6 @@
         <div>
             <h4 class="mb-1" style="color: #6a1b29;">{{ material.nombre }} (<code>{{ material.id_unico }}</code>)</h4>
             <span class="text-muted small">Categoría: {{ material.categoria }} | Ubicación actual: {{ material.estante }}, {{ material.cajon }}</span>
-            {% if material.estatus == 'BAJA_DEFINITIVA' and material.motivo_baja %}
-            <div class="small text-dark mt-1">
-                <strong>Motivo de baja:</strong> {{ material.motivo_baja }}
-            </div>
-            {% endif %}
         </div>
         <div>
             {% if material.estatus == 'DISPONIBLE' %}
@@ -51,6 +46,12 @@
 <div class="alert alert-danger">{{ error_msg }}</div>
 {% endif %}
 
+{% if material.estatus == 'BAJA_DEFINITIVA' %}
+<div class="card shadow-sm border-0 p-4">
+    <h5 class="mb-2" style="color: #6a1b29;">Motivo de Baja Definitiva</h5>
+    <p class="mb-0 fs-5">{{ material.motivo_baja|default:"No especificado" }}</p>
+</div>
+{% else %}
 <div class="row g-4">
     <!-- 1) Modificar ubicación física -->
     <div class="col-md-4">
@@ -144,6 +145,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% include "shared/session_timeout.html" %}
 {% endblock %}
 
@@ -157,12 +159,15 @@
         const modal = new bootstrap.Modal(document.getElementById('modalConfirmacionSRS'));
         modal.show();
     }
-    document.getElementById('btnConfirmarModal').addEventListener('click', function () {
-        if (formularioPendienteId) {
-            const form = document.getElementById(formularioPendienteId);
-            form.submit();
-        }
-    });
+    const btnConfirmar = document.getElementById('btnConfirmarModal');
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', function () {
+            if (formularioPendienteId) {
+                const form = document.getElementById(formularioPendienteId);
+                form.submit();
+            }
+        });
+    }
 </script>
 {% endblock %}
 
