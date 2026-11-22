@@ -11,6 +11,7 @@ from .forms import (
     RegistroAlumnoForm,
     RegistroPersonalForm,
     RegistroLaboratoristaPublicoForm,
+    EditarUsuarioForm,
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -49,6 +50,7 @@ def registrar_alumno(request):
             alumno.set_password(form.cleaned_data['password'])
             alumno.rol = Usuario.Rol.ALUMNO
             alumno.save()
+            messages.success(request, 'Registro de alumno completado. Ya puedes iniciar sesión.')
             return redirect('login')
     else:
         form = RegistroAlumnoForm()
@@ -131,6 +133,30 @@ def padron_usuarios(request):
             )
 
     return render(request, 'usuarios/padron_usuarios.html', {'usuarios': usuarios, 'query': query})
+
+
+@login_required
+@user_passes_test(lambda u: u.rol == Usuario.Rol.ADMINISTRADOR)
+def editar_usuario(request, user_id):
+    """Permite al Administrador editar los datos, rol o estatus de un usuario."""
+    usuario_objetivo = get_object_or_404(Usuario, id=user_id)
+
+    if request.method == 'POST':
+        form = EditarUsuarioForm(request.POST, instance=usuario_objetivo)
+        if form.is_valid():
+            usuario_editado = form.save()
+            messages.success(
+                request,
+                f"Los datos de {usuario_editado.nombre_completo} ({usuario_editado.boleta_credencial}) fueron actualizados.",
+            )
+            return redirect('padron_usuarios')
+    else:
+        form = EditarUsuarioForm(instance=usuario_objetivo)
+
+    return render(request, 'usuarios/editar_usuario.html', {
+        'form': form,
+        'usuario_objetivo': usuario_objetivo,
+    })
 
 
 @login_required
@@ -305,4 +331,5 @@ def registrar_laboratorista_publico(request):
     else:
         form = RegistroLaboratoristaPublicoForm()
     return render(request, 'usuarios/registro_laboratorista.html', {'form': form})
+
 

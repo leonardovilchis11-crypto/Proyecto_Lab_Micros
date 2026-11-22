@@ -286,10 +286,11 @@
                 <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
                         <h5>Padrón y Personal</h5>
-                        <p class="text-muted small">Administra cuentas de alumnos, da de alta laboratoristas y gestiona bajas.</p>
+                        <p class="text-muted small">Administra cuentas de alumnos, registra alumnos y personal operativo y gestiona bajas.</p>
                         <div class="d-grid gap-2 mt-auto">
                             <a href="{% url 'padron_usuarios' %}" class="btn text-white" style="background-color: #6a1b29;">Padrón de Usuarios</a>
-                            <a href="{% url 'registrar_personal' %}" class="btn btn-outline-dark btn-sm">Alta de Personal Operativo</a>
+                            <a href="{% url 'registro_alumno' %}" class="btn btn-outline-dark btn-sm">+ Registrar Alumno</a>
+                            <a href="{% url 'registrar_personal' %}" class="btn btn-outline-secondary btn-sm">Alta de Personal Operativo</a>
                         </div>
                     </div>
                 </div>
@@ -363,5 +364,4 @@ document.addEventListener("DOMContentLoaded", function () {
 {% include "shared/session_timeout.html" %}
 </body>
 </html>
-
 

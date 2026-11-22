@@ -31,7 +31,7 @@ urlpatterns = [
     
     # Pantalla 7: Padrón de usuarios
     path('padron/', views.padron_usuarios, name='padron_usuarios'),
+    path('editar/<int:user_id>/', views.editar_usuario, name='editar_usuario'),
     path('eliminar/<int:user_id>/', views.eliminar_usuario, name='eliminar_usuario'),
 ]
-
 

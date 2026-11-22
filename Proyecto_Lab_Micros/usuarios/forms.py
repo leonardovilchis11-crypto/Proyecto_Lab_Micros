@@ -196,7 +196,6 @@ class RegistroPersonalForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Solo permitir elegir roles operativos (Laboratorista o Administrador)
         self.fields['rol'].choices = [
             (Usuario.Rol.LABORATORISTA, 'Laboratorista'),
             (Usuario.Rol.ADMINISTRADOR, 'Administrador'),
@@ -278,5 +277,65 @@ class RegistroLaboratoristaPublicoForm(forms.ModelForm):
             usuario.save()
         return usuario
 
+
+class EditarUsuarioForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = [
+            'first_name',
+            'last_name',
+            'boleta_credencial',
+            'correo_institucional',
+            'rol',
+            'estatus',
+            'is_active',
+        ]
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'boleta_credencial': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo_institucional': forms.EmailInput(attrs={'class': 'form-control'}),
+            'rol': forms.Select(attrs={'class': 'form-select'}),
+            'estatus': forms.Select(attrs={'class': 'form-select'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'first_name': 'Nombre(s)',
+            'last_name': 'Apellidos',
+            'is_active': 'Cuenta activa',
+        }
+
+    def clean_boleta_credencial(self):
+        boleta = (self.cleaned_data.get('boleta_credencial') or '').strip()
+        if not boleta:
+            raise ValidationError("La boleta o credencial es obligatoria.")
+        qs = Usuario.objects.filter(boleta_credencial__iexact=boleta)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise ValidationError("Este número de boleta o credencial ya está registrado en otro usuario.")
+        return boleta
+
+    def clean_correo_institucional(self):
+        correo = (self.cleaned_data.get('correo_institucional') or '').strip()
+        if not correo:
+            raise ValidationError("El correo institucional es obligatorio.")
+        qs = Usuario.objects.filter(correo_institucional__iexact=correo)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise ValidationError("Este correo institucional ya está registrado en otro usuario.")
+        return correo
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.username = _generar_username_nombre_completo(
+            usuario,
+            self.cleaned_data.get('first_name'),
+            self.cleaned_data.get('last_name'),
+        )
+        if commit:
+            usuario.save()
+        return usuario
 
     
