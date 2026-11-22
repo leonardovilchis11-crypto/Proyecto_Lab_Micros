@@ -1,5 +1,5 @@
 {% if request.user.is_authenticated %}
-<div class="dropdown me-2 d-inline-block">
+<div class="dropdown me-2 d-inline-block" id="notifDropdownContainer">
     <button class="btn btn-outline-light btn-sm position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notificaciones">
         🔔
         {% if notificaciones_no_leidas %}
@@ -8,27 +8,88 @@
             </span>
         {% endif %}
     </button>
-    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifDropdown" style="min-width: 310px; max-width: 92vw; max-height: 360px; overflow-y: auto; z-index: 1050;">
-        <li class="dropdown-header fw-bold d-flex justify-content-between align-items-center">
-            <span>Notificaciones</span>
-            <span class="badge bg-secondary">{{ notificaciones_no_leidas }}</span>
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0" aria-labelledby="notifDropdown" style="min-width: 330px; max-width: 92vw; max-height: 380px; overflow-y: auto; z-index: 1050;">
+        <li class="px-3 py-2 bg-light border-bottom d-flex justify-content-between align-items-center sticky-top">
+            <span class="fw-bold small" style="color: #6a1b29;">Notificaciones</span>
+            <span class="badge rounded-pill {% if notificaciones_no_leidas %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                {{ notificaciones_no_leidas|default:0 }}
+            </span>
         </li>
-        <li><hr class="dropdown-divider my-1"></li>
         {% if notificaciones %}
             {% for n in notificaciones %}
-                <li>
-                    <div class="dropdown-item-text small border-bottom py-2">
-                        <div class="fw-semibold text-dark">{{ n.titulo }}</div>
-                        <div class="text-muted">{{ n.mensaje }}</div>
+                <li class="{% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="dropdown-item-text px-3 py-2 {% if n.leida == False %}bg-warning-subtle bg-opacity-25{% endif %}" style="white-space: normal;">
+                        <div class="fw-semibold small text-dark mb-1">{{ n.titulo }}</div>
+                        <div class="notif-mensaje small text-secondary" data-raw-msg="{{ n.mensaje|escape }}">{{ n.mensaje }}</div>
                     </div>
                 </li>
             {% endfor %}
         {% else %}
-            <li class="dropdown-item-text small text-muted py-3 text-center">
+            <li class="dropdown-item-text small text-muted py-4 text-center">
                 No tienes notificaciones nuevas.
             </li>
         {% endif %}
     </ul>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("notifDropdownContainer");
+    if (!container) return;
+
+    function formatearHora(isoStr) {
+        if (!isoStr) return "";
+        const fecha = new Date(isoStr);
+        if (isNaN(fecha.getTime())) return isoStr;
+        return fecha.toLocaleString("es-MX", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    function parsearDiccionario(texto) {
+        if (!texto || !texto.includes("{")) return null;
+        const match = texto.match(/\{[\s\S]*\}/);
+        if (!match) return null;
+        try {
+            const normalizado = match[0]
+                .replace(/'/g, '"')
+                .replace(/\bNone\b/g, "null")
+                .replace(/\bTrue\b/g, "true")
+                .replace(/\bFalse\b/g, "false");
+            return JSON.parse(normalizado);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    container.querySelectorAll(".notif-mensaje").forEach(function (el) {
+        const raw = (el.dataset.rawMsg || el.textContent || "").trim();
+        const datos = parsearDiccionario(raw);
+        if (!datos || (!datos.material && !datos.folio && !datos.fecha_limite)) {
+            return;
+        }
+
+        const partes = [];
+        if (datos.material) {
+            const codigo = datos.id_material ? ` (${datos.id_material})` : "";
+            partes.push(`<div class="text-dark fw-medium">${datos.material}${codigo}</div>`);
+        }
+        if (datos.folio) {
+            partes.push(`<div><strong>Folio:</strong> ${datos.folio}</div>`);
+        }
+        if (datos.fecha_limite) {
+            partes.push(`<div><strong>Límite de devolución:</strong> ${formatearHora(datos.fecha_limite)}</div>`);
+        }
+
+        if (partes.length > 0) {
+            el.innerHTML = partes.join("");
+        }
+    });
+});
+</script>
 {% endif %}
+
 
