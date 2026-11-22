@@ -34,20 +34,56 @@
                 </div>
             {% endif %}
 
-            {% if form.errors %}
-                <div class="alert alert-danger">Boleta o contraseña incorrecta.</div>
+            {% if form.errors or form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% if form.non_field_errors %}
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    {% else %}
+                        Nombre o usuario, boleta o contraseña incorrecta.
+                    {% endif %}
+                </div>
             {% endif %}
 
-            <form method="post">
+            <form method="post" autocomplete="off">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label class="form-label" for="id_username">Número de Boleta / Credencial</label>
-                    <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+                    <label class="form-label" for="id_nombre_usuario">Nombre de usuario o nombre</label>
+                    <input
+                        type="text"
+                        name="nombre_usuario"
+                        id="id_nombre_usuario"
+                        class="form-control"
+                        placeholder="Ej. Leonardo_17 o Leonardo"
+                        value="{{ form.nombre_usuario.value|default:request.POST.nombre_usuario|default:'' }}"
+                        required
+                        autofocus
+                    >
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="id_boleta_credencial">Número de Boleta / Credencial</label>
+                    <input
+                        type="text"
+                        name="boleta_credencial"
+                        id="id_boleta_credencial"
+                        class="form-control"
+                        placeholder="Ej. 2022350873"
+                        value="{{ form.boleta_credencial.value|default:request.POST.boleta_credencial|default:'' }}"
+                        required
+                    >
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="id_password">Clave de acceso</label>
                     <div class="input-group">
-                        <input type="password" name="password" id="id_password" class="form-control" required>
+                        <input
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            class="form-control"
+                            value="{{ form.password.value|default:request.POST.password|default:'' }}"
+                            required
+                        >
                         <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Mostrar u ocultar contraseña" title="Mostrar u ocultar contraseña">
                             <span id="togglePasswordIcon">👁️</span>
                         </button>
