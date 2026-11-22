@@ -96,6 +96,7 @@ def _solicitud_a_fila(solicitud):
             f"{item['nombre']} (x{item['cantidad']})"
             for item in solicitud.equipos
         ),
+        'equipos_detalle': solicitud.equipos,
         'fecha': solicitud.fecha.isoformat(),
         'fecha_formateada': _fecha_formateada(solicitud.fecha),
         'bloque': solicitud.bloque,
@@ -103,29 +104,35 @@ def _solicitud_a_fila(solicitud):
     }
 
 
-
 def _obtener_carrito_normalizado(request):
     """
-    Lee request.session['carrito_solicitud'] (alimentado desde catalogo/views.py)
-    y consolida cantidades si el alumno agregó varias veces el mismo artículo.
+    Lee request.session['carrito_solicitud'] y consolida cantidades conservando
+    categoría y especificaciones de cada material.
     """
+    inventario_por_id = {str(m['id']): m for m in INVENTARIO_ITEMS}
     raw_carrito = request.session.get('carrito_solicitud', [])
     consolidado = {}
     for item in raw_carrito:
         key = str(item.get('id'))
+        base = inventario_por_id.get(key, {})
+        cant = int(item.get('cantidad', 1))
         if key not in consolidado:
             consolidado[key] = {
                 'id': item.get('id'),
-                'id_unico': item.get('id_unico', f"EQ-{item.get('id')}"),
-                'nombre': item.get('nombre', 'Equipo de laboratorio'),
-                'cantidad': int(item.get('cantidad', 1)),
+                'id_unico': item.get('id_unico') or base.get('id_unico', f"EQ-{item.get('id')}"),
+                'nombre': item.get('nombre') or base.get('nombre', 'Equipo de laboratorio'),
+                'categoria': item.get('categoria') or base.get('categoria', 'General'),
+                'especificaciones': item.get('especificaciones') or base.get('especificaciones', ''),
+                'cantidad': cant,
             }
         else:
-            # Si viene repetido sin campo 'cantidad' desde catálogo, sumamos 1
             if 'cantidad' not in item:
-                consolidado[key]['cantidad'] += 1
+                consolidado[key]['cantidad'] += cant
+            else:
+                consolidado[key]['cantidad'] = max(consolidado[key]['cantidad'], cant)
     lista = list(consolidado.values())
     request.session['carrito_solicitud'] = lista
+    request.session.modified = True
     return lista
 
 
@@ -277,7 +284,7 @@ def _generar_comprobante_pdf(solicitud, fecha_prestamo, fecha_limite, nombre):
         leftMargin=42,
         topMargin=36,
         bottomMargin=42,
-        title=f'Comprobante de préstamo {solicitud.folio}',
+        title=f'Comprobante de reserva/préstamo {solicitud.folio}',
         author='Laboratorio de Microcontroladores ESIME',
     )
     carpeta_logos = (
@@ -324,12 +331,12 @@ def _generar_comprobante_pdf(solicitud, fecha_prestamo, fecha_limite, nombre):
     ]))
 
     datos_prestamo = Table([
-        [parrafo('Datos del préstamo', 'TituloSeccion'), ''],
+        [parrafo('Datos de la reserva / préstamo', 'TituloSeccion'), ''],
         [parrafo('Folio', 'EtiquetaTabla'), parrafo(solicitud.folio)],
         [parrafo('Alumno', 'EtiquetaTabla'), parrafo(nombre)],
         [parrafo('Boleta', 'EtiquetaTabla'), parrafo(solicitud.alumno.boleta_credencial)],
-        [parrafo('Fecha y hora de entrega', 'EtiquetaTabla'), parrafo(fecha_prestamo)],
-        [parrafo('Límite de devolución', 'EtiquetaTabla'), parrafo(fecha_limite)],
+        [parrafo('Fecha y hora / bloque', 'EtiquetaTabla'), parrafo(fecha_prestamo)],
+        [parrafo('Límite / estatus', 'EtiquetaTabla'), parrafo(fecha_limite)],
     ], colWidths=[165, documento.width - 165])
     datos_prestamo.setStyle(TableStyle([
         ('SPAN', (0, 0), (-1, 0)),
@@ -347,20 +354,24 @@ def _generar_comprobante_pdf(solicitud, fecha_prestamo, fecha_limite, nombre):
     filas_equipos = [[
         parrafo('#', 'EncabezadoTabla'),
         parrafo('Equipo o material', 'EncabezadoTabla'),
-        parrafo('Identificador único', 'EncabezadoTabla'),
+        parrafo('ID / Características', 'EncabezadoTabla'),
     ]]
-    for indice, equipo in enumerate(
-        (equipo for equipo in solicitud.equipos if equipo.get('prestamo_activo')),
-        start=1,
-    ):
+    equipos_fuente = [
+        equipo for equipo in solicitud.equipos
+        if equipo.get('prestamo_activo') or not isinstance(equipo, dict) or 'prestamo_activo' not in equipo
+    ]
+    for indice, equipo in enumerate(equipos_fuente, start=1):
+        id_y_specs = equipo.get('id_unico', '')
+        if equipo.get('especificaciones'):
+            id_y_specs = f"{id_y_specs} — {equipo.get('especificaciones')}"
         filas_equipos.append([
             parrafo(indice),
-            parrafo(equipo.get('nombre', 'Equipo')),
-            parrafo(equipo.get('id_unico', '')),
+            parrafo(f"{equipo.get('nombre', 'Equipo')} (x{equipo.get('cantidad', 1)})"),
+            parrafo(id_y_specs),
         ])
     tabla_equipos = Table(
         filas_equipos,
-        colWidths=[34, documento.width - 184, 150],
+        colWidths=[34, documento.width - 224, 190],
         repeatRows=1,
     )
     tabla_equipos.setStyle(TableStyle([
@@ -376,8 +387,8 @@ def _generar_comprobante_pdf(solicitud, fecha_prestamo, fecha_limite, nombre):
     ]))
     aviso = Table([[
         parrafo(
-            'El alumno confirma la recepción del equipo y acepta devolverlo '
-            'antes del límite indicado, conforme al reglamento del laboratorio.',
+            'El alumno confirma la solicitud/recepción del equipo y acepta '
+            'cumplir con el horario y devolución conforme al reglamento del laboratorio.',
             'AvisoComprobante',
         ),
     ]], colWidths=[documento.width])
@@ -393,11 +404,11 @@ def _generar_comprobante_pdf(solicitud, fecha_prestamo, fecha_limite, nombre):
     elementos = [
         encabezado,
         Spacer(1, 12),
-        parrafo('COMPROBANTE DE PRÉSTAMO', 'TituloComprobante'),
+        parrafo('COMPROBANTE DE RESERVA / PRÉSTAMO', 'TituloComprobante'),
         Spacer(1, 8),
         datos_prestamo,
         Spacer(1, 16),
-        parrafo('Equipo(s) entregado(s)', 'TituloSeccion'),
+        parrafo('Material / Equipo solicitado o entregado', 'TituloSeccion'),
         Spacer(1, 6),
         tabla_equipos,
         Spacer(1, 18),
@@ -423,19 +434,16 @@ def _generar_comprobante_pdf(solicitud, fecha_prestamo, fecha_limite, nombre):
 # ==============================================================================
 
 @login_required
-@login_required
 def vista_carrito(request):
     """Pantalla 14: Carrito de Solicitudes y Reserva (Req. 1.6, 3.1, 3.3.1, 3.4, 4.0)."""
     if request.user.rol != 'ALUMNO':
         return redirect('reservas:bandeja_solicitudes')
 
-    # Regla Req. 3.4: Bloqueo automático sábado (5) y domingo (6)
     ahora = timezone.localtime()
     hoy = ahora.date()
     if not ReservaService.es_dia_habil(hoy):
         return redirect('reservas:fuera_horario')
 
-    # Regla Req. 3.1 (REQ-10): Sincronizar préstamos vencidos y verificar adeudos activos
     sincronizar_adeudos(ahora=ahora, alumno=request.user)
     _actualizar_estatus_alumno(request.user)
     adeudos_activos = list(
@@ -460,6 +468,7 @@ def vista_carrito(request):
                     item['cantidad'] = nueva_cant
                     break
             request.session['carrito_solicitud'] = carrito
+            request.session.modified = True
             messages.success(request, 'Cantidad actualizada en tu carrito.')
             return redirect('reservas:carrito')
 
@@ -467,6 +476,7 @@ def vista_carrito(request):
             item_id = str(request.POST.get('item_id'))
             carrito = [i for i in carrito if str(i['id']) != item_id]
             request.session['carrito_solicitud'] = carrito
+            request.session.modified = True
             messages.info(request, 'Artículo eliminado del carrito.')
             return redirect('reservas:carrito')
 
@@ -505,6 +515,8 @@ def vista_carrito(request):
                         'id': item['id'],
                         'id_unico': item['id_unico'],
                         'nombre': item['nombre'],
+                        'categoria': item.get('categoria', 'General'),
+                        'especificaciones': item.get('especificaciones', ''),
                         'cantidad': item['cantidad'],
                     }
                     for item in carrito
@@ -513,6 +525,7 @@ def vista_carrito(request):
                 bloque=bloque,
             )
             request.session['carrito_solicitud'] = []
+            request.session.modified = True
             messages.success(
                 request,
                 f"Solicitud {nueva_reserva.folio} confirmada para el "
@@ -532,6 +545,32 @@ def vista_carrito(request):
         'adeudos_activos': adeudos_activos,
     }
     return render(request, 'reservas/carrito.html', context)
+
+
+@login_required
+def comprobante_reserva_pdf(request, folio):
+    """Genera el comprobante en PDF de una reserva del alumno."""
+    solicitud = SolicitudPrestamo.objects.filter(
+        folio=folio,
+        alumno=request.user,
+    ).select_related('alumno').first()
+    if not solicitud:
+        messages.error(request, 'No se encontró la reserva solicitada.')
+        return redirect('reservas:mis_reservas')
+
+    fecha_texto = f"{_fecha_formateada(solicitud.fecha)} — {solicitud.bloque}"
+    limite_texto = f"Estatus: {solicitud.get_estatus_display()}"
+    nombre = _nombre_usuario(solicitud.alumno)
+    pdf = _generar_comprobante_pdf(
+        solicitud,
+        fecha_texto,
+        limite_texto,
+        nombre,
+    )
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="comprobante-reserva-{solicitud.folio}.pdf"'
+    return response
+
 
 @login_required
 def vista_mis_reservas(request):
@@ -911,11 +950,11 @@ def vista_registrar_prestamo(request):
             unidad for unidad in INVENTARIO_ITEMS if unidad['estatus'] == 'DISPONIBLE'
         ]
 
+    unidades_por_id_actual = {str(unidad['id']): unidad for unidad in INVENTARIO_ITEMS}
     seleccionadas = [
-        unidades_por_id
+        unidades_por_id_actual[str(item_id)]
         for item_id in flujo.get('equipo_ids', [])
-        for unidades_por_id in INVENTARIO_ITEMS
-        if str(unidades_por_id['id']) == str(item_id)
+        if str(item_id) in unidades_por_id_actual
     ]
     return render(request, 'reservas/registrar_prestamo.html', {
         'paso': paso,
@@ -1201,7 +1240,6 @@ def vista_bandeja_solicitudes(request):
             messages.error(request, 'No se encontró la solicitud seleccionada.')
         return redirect('reservas:bandeja_solicitudes')
 
-    # Filtros de búsqueda por boleta/nombre, estatus y fecha (Req. 3.0.3)
     q = request.GET.get('q', '').strip().lower()
     estatus_filtro = request.GET.get('estatus', '').strip()
     fecha_filtro = request.GET.get('fecha', '').strip()
@@ -1632,3 +1670,4 @@ def notificaciones_administrador(_request):
         })
 
     return JsonResponse({'eventos': eventos})
+

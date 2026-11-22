@@ -17,6 +17,9 @@ _SMTP_CONFIGURATION_WARNING_EMITTED = False
 class ReservaService:
     """Reglas de negocio de disponibilidad operativa y reservas (Req. 3.4 y 4.0)."""
 
+    # Bandera temporal para pruebas: permite reservar en fines de semana y cualquier bloque horario
+    MODO_PRUEBAS_SIN_RESTRICCION_HORARIA = True
+
     BLOQUES_HORARIOS = [
         '07:00 - 08:30',
         '08:30 - 10:00',
@@ -30,14 +33,16 @@ class ReservaService:
         '20:30 - 22:00',
     ]
 
-    @staticmethod
-    def es_dia_habil(fecha_obj):
-        """Retorna True si es lunes (0) a viernes (4). Bloquea sábado (5) y domingo (6)."""
+    @classmethod
+    def es_dia_habil(cls, fecha_obj):
+        """Retorna True si es lunes (0) a viernes (4); en modo pruebas siempre True."""
+        if cls.MODO_PRUEBAS_SIN_RESTRICCION_HORARIA:
+            return True
         return fecha_obj.weekday() < 5
 
     @classmethod
     def obtener_siguiente_dia_habil(cls, fecha_referencia):
-        """Calcula el próximo lunes a viernes a partir de la fecha dada."""
+        """Calcula el próximo día hábil a partir de la fecha dada."""
         siguiente = fecha_referencia + timedelta(days=1)
         while not cls.es_dia_habil(siguiente):
             siguiente += timedelta(days=1)
@@ -45,13 +50,17 @@ class ReservaService:
 
     @classmethod
     def validar_fecha_y_bloque(cls, fecha_obj, bloque, ahora=None):
-        """Valida fecha hábil, bloque oficial y hora de inicio disponible."""
+        """Valida bloque oficial; en modo pruebas omite restricciones de día/hora."""
+        if bloque not in cls.BLOQUES_HORARIOS:
+            raise ValueError('Selecciona un bloque horario válido dentro del horario operativo.')
+
+        if cls.MODO_PRUEBAS_SIN_RESTRICCION_HORARIA:
+            return
+
         if not cls.es_dia_habil(fecha_obj):
             raise ValueError(
                 'El servicio de reservas y préstamos está disponible únicamente de lunes a viernes (Req. 3.4).'
             )
-        if bloque not in cls.BLOQUES_HORARIOS:
-            raise ValueError('Selecciona un bloque horario válido dentro del horario operativo.')
 
         momento_actual = timezone.localtime(ahora) if ahora else timezone.localtime()
         if fecha_obj < momento_actual.date():
@@ -260,3 +269,5 @@ def sincronizar_adeudos(ahora=None, alumno=None, actor=None):
                 notificaciones_enviadas += 1
 
     return notificaciones_enviadas
+
+

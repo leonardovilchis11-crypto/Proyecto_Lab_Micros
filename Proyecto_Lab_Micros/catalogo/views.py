@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect
 from inventario.views import INVENTARIO_ITEMS, CATEGORIAS_SISTEMA
 
+
+def _contar_carrito(carrito):
+    return sum(int(item.get('cantidad', 1)) for item in carrito)
+
+
 # Pantalla 4: Catálogo de equipos con filtros en tiempo real y semáforo (Req. 2.0, 2.0.1, 2.3)
 def vista_catalogo(request):
     query = request.GET.get('q', '').strip()
@@ -69,7 +74,7 @@ def vista_catalogo(request):
         'query': query,
         'categoria_sel': categoria,
         'disponibilidad_sel': disponibilidad,
-        'carrito_count': len(carrito),
+        'carrito_count': _contar_carrito(carrito),
         'mensaje_catalogo': request.session.pop('mensaje_catalogo', None),
     }
     return render(request, 'catalogo/catalogo.html', context)
@@ -103,7 +108,7 @@ def detalle_equipo(request, item_id):
         'q': q,
         'categoria': categoria,
         'disponibilidad': disponibilidad,
-        'carrito_count': len(carrito),
+        'carrito_count': _contar_carrito(carrito),
     })
 
 
@@ -111,7 +116,22 @@ def agregar_al_carrito(request, item_id):
     equipo = next((m for m in INVENTARIO_ITEMS if m['id'] == item_id), None)
     if equipo and equipo['estatus'] == 'DISPONIBLE':
         carrito = request.session.get('carrito_solicitud', [])
-        carrito.append({'id': equipo['id'], 'id_unico': equipo['id_unico'], 'nombre': equipo['nombre']})
+        existente = next((i for i in carrito if str(i.get('id')) == str(equipo['id'])), None)
+        if existente:
+            existente['cantidad'] = int(existente.get('cantidad', 1)) + 1
+            existente.setdefault('categoria', equipo.get('categoria', 'General'))
+            existente.setdefault('especificaciones', equipo.get('especificaciones', ''))
+        else:
+            carrito.append({
+                'id': equipo['id'],
+                'id_unico': equipo['id_unico'],
+                'nombre': equipo['nombre'],
+                'categoria': equipo.get('categoria', 'General'),
+                'especificaciones': equipo.get('especificaciones', ''),
+                'cantidad': 1,
+            })
         request.session['carrito_solicitud'] = carrito
+        request.session.modified = True
         request.session['mensaje_catalogo'] = f"Se agregó '{equipo['nombre']} ({equipo['id_unico']})' a tu carrito de solicitud."
     return redirect('catalogo:lista')
+
