@@ -46,7 +46,6 @@ def registrar_alumno(request):
         form = RegistroAlumnoForm(request.POST)
         if form.is_valid():
             alumno = form.save(commit=False)
-            alumno.username = alumno.boleta_credencial
             alumno.set_password(form.cleaned_data['password'])
             alumno.rol = Usuario.Rol.ALUMNO
             alumno.save()
@@ -243,7 +242,6 @@ def registrar_personal(request):
         form = RegistroPersonalForm(request.POST)
         if form.is_valid():
             personal = form.save(commit=False)
-            personal.username = personal.boleta_credencial
             personal.set_password(form.cleaned_data['password'])
             personal.save()
             return redirect('padron_usuarios')
@@ -300,7 +298,6 @@ def registrar_laboratorista_publico(request):
         form = RegistroLaboratoristaPublicoForm(request.POST)
         if form.is_valid():
             lab = form.save(commit=False)
-            lab.username = lab.boleta_credencial
             lab.set_password(form.cleaned_data['password'])
             lab.rol = Usuario.Rol.LABORATORISTA
             lab.save()
