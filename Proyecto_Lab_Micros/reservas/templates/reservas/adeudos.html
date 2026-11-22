@@ -95,7 +95,7 @@
                             <small class="d-block text-muted">{{ adeudo.alumno.boleta_credencial }}</small>
                             <small class="d-block">Folio {{ adeudo.solicitud.folio }}</small>
                         </td>
-                        <td>
+                        <td class="celda-material-adeudo" data-id-material="{{ adeudo.id_material|escape }}" data-nombre-material="{{ adeudo.material|escape }}">
                             <strong>{{ adeudo.get_tipo_display }}</strong>
                             <span class="d-block">{{ adeudo.material }}</span>
                             <code>{{ adeudo.id_material }}</code>
@@ -108,8 +108,12 @@
                                 <input type="hidden" name="accion" value="valorar">
                                 <input type="hidden" name="adeudo_id" value="{{ adeudo.pk }}">
                                 <div>
-                                    <label class="form-label small">Monto (MXN)</label>
+                                    <label class="form-label small mb-1">Monto (MXN)</label>
                                     {{ adeudo.form_valoracion.monto }}
+                                    <div class="form-text text-muted small mt-1">
+                                        El precio de mercado sugerido es:
+                                        <strong class="text-dark precio-mercado-valor">Consultar referencia</strong>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="form-label small">O pieza de reposición</label>
@@ -198,4 +202,43 @@
             </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const PRECIOS_POR_CLAVE = [
+        { patron: /ESP32|MIC-ESP32/i, precio: "$125 – $218 MXN" },
+        { patron: /PIC16|PICKIT|MIC-PIC16/i, precio: "$353 – $496 MXN (kit base)" },
+        { patron: /MEGA|ATMEGA2560|MIC-MEGA/i, precio: "$344 – $450 MXN (comp.) / $956 – $2,257 MXN (orig.)" },
+        { patron: /STM32|NUCLEO|MIC-STM32/i, precio: "$365 – $798 MXN" },
+        { patron: /8086|8088|MIC-8086/i, precio: "Cotización por fabricante/proyecto" },
+        { patron: /TBS1102B|OSCILOSCOPIO|INS-OSC/i, precio: "~$53,451 MXN (ref. nuevo)" },
+        { patron: /FUENTE.*30V|0-30V|INS-FUE/i, precio: "$1,790 – $2,895 MXN" },
+        { patron: /DG1022Z|RIGOL|INS-GEN/i, precio: "$7,453 – $9,751 MXN" },
+        { patron: /FLUKE\s*115|INS-MUL/i, precio: "$5,098 – $10,924 MXN" },
+        { patron: /ANALIZADOR\s*L[ÓO]GICO|INS-ANA/i, precio: "$147 – $293 MXN" },
+        { patron: /PUNTA.*OSCILOSCOPIO|CAB-OSC/i, precio: "$148 – $268 MXN (sonda) / ~$1,793 MXN (Tektronix)" },
+        { patron: /BNC.*CAIM[ÁA]N|CAB-BNC/i, precio: "$79 – $235 MXN" },
+        { patron: /10\s*CABLES\s*CAIM[ÁA]N|50\s*CM|CAB-CAI/i, precio: "$66 – $230 MXN" },
+        { patron: /BANANA.*CAIM[ÁA]N|CAB-BAN/i, precio: "$61 – $185 MXN" }
+    ];
+
+    document.querySelectorAll("tbody tr").forEach(function (fila) {
+        const celdaMat = fila.querySelector(".celda-material-adeudo");
+        const destino = fila.querySelector(".precio-mercado-valor");
+        if (!celdaMat || !destino) return;
+
+        const textoBusqueda = [
+            celdaMat.dataset.idMaterial || "",
+            celdaMat.dataset.nombreMaterial || "",
+            celdaMat.textContent || ""
+        ].join(" ");
+
+        const match = PRECIOS_POR_CLAVE.find(item => item.patron.test(textoBusqueda));
+        if (match) {
+            destino.textContent = match.precio;
+        }
+    });
+});
+</script>
 {% endblock %}
+
