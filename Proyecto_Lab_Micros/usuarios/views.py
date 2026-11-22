@@ -1,12 +1,17 @@
+from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import logout as auth_logout
 from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from .models import Usuario
-from .forms import RegistroAlumnoForm, RegistroPersonalForm, RegistroLaboratoristaPublicoForm
+from .forms import (
+    LoginForm,
+    RegistroAlumnoForm,
+    RegistroPersonalForm,
+    RegistroLaboratoristaPublicoForm,
+)
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -15,6 +20,25 @@ from django.conf import settings
 from django.contrib import messages
 from reservas.models import Adeudo, SolicitudPrestamo
 from reservas.services import sincronizar_adeudos
+
+
+def login_view(request):
+    """Inicio de sesión con nombre/usuario, boleta/credencial y clave, conservando datos al fallar."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            siguiente = request.GET.get('next') or request.POST.get('next')
+            if siguiente and siguiente.startswith('/'):
+                return redirect(siguiente)
+            return redirect('dashboard')
+    else:
+        form = LoginForm(request)
+
+    return render(request, 'usuarios/login.html', {'form': form})
 
 
 def registrar_alumno(request):

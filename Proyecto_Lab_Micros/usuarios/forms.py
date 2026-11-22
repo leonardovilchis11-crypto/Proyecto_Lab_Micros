@@ -1,25 +1,112 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from .models import Usuario
 
+
+class LoginForm(forms.Form):
+    nombre_usuario = forms.CharField(
+        label="Nombre de usuario o nombre",
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_nombre_usuario',
+            'placeholder': 'Ej. Leonardo_17 o Leonardo Vilchis',
+            'autocomplete': 'off',
+        }),
+    )
+    boleta_credencial = forms.CharField(
+        label="Número de Boleta / Credencial",
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_boleta_credencial',
+            'placeholder': 'Ej. 2022350873',
+            'autocomplete': 'off',
+        }),
+    )
+    password = forms.CharField(
+        label="Clave de acceso",
+        strip=False,
+        widget=forms.PasswordInput(
+            render_value=True,
+            attrs={
+                'class': 'form-control',
+                'id': 'id_password',
+                'autocomplete': 'off',
+            },
+        ),
+    )
+
+    def __init__(self, request=None, *args, **kwargs):
+        self.request = request
+        self.user_cache = None
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nombre_ingresado = " ".join((cleaned_data.get("nombre_usuario") or "").split())
+        boleta_ingresada = (cleaned_data.get("boleta_credencial") or "").strip()
+        password = cleaned_data.get("password")
+
+        if nombre_ingresado and boleta_ingresada and password:
+            usuario_obj = Usuario.objects.filter(
+                boleta_credencial__iexact=boleta_ingresada
+            ).first()
+
+            nombre_valido = False
+            if usuario_obj is not None:
+                nombre_completo = " ".join(
+                    f"{usuario_obj.first_name} {usuario_obj.last_name}".split()
+                ).lower()
+                nombre_ingresado_low = nombre_ingresado.lower()
+
+                if (
+                    (getattr(usuario_obj, "username", "") or "").lower() == nombre_ingresado_low
+                    or (usuario_obj.first_name or "").strip().lower() == nombre_ingresado_low
+                    or (nombre_completo and nombre_completo == nombre_ingresado_low)
+                ):
+                    nombre_valido = True
+
+            if usuario_obj is not None and nombre_valido:
+                valor_login = getattr(usuario_obj, Usuario.USERNAME_FIELD)
+                self.user_cache = authenticate(
+                    self.request,
+                    username=valor_login,
+                    password=password,
+                )
+
+            if self.user_cache is None:
+                raise ValidationError(
+                    "El nombre de usuario/nombre, la boleta o la clave de acceso son incorrectos."
+                )
+            if not self.user_cache.is_active:
+                raise ValidationError("Esta cuenta se encuentra inactiva.")
+
+        return cleaned_data
+
+    def get_user(self):
+        return self.user_cache
+
+
 class RegistroAlumnoForm(forms.ModelForm):
     first_name = forms.CharField(
-        max_length=150, 
+        max_length=150,
         label="Nombre(s)",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Leonardo'})
     )
     last_name = forms.CharField(
-        max_length=150, 
+        max_length=150,
         label="Apellidos",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Vilchis Martínez'})
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}), 
-        min_length=8, 
+        widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}),
+        min_length=8,
         label="Clave de acceso"
     )
     confirmar_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}), 
+        widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}),
         label="Confirmar clave"
     )
 
@@ -53,11 +140,12 @@ class RegistroAlumnoForm(forms.ModelForm):
             raise ValidationError("Las claves de acceso no coinciden.")
         return cleaned_data
 
+
 class RegistroPersonalForm(forms.ModelForm):
     first_name = forms.CharField(max_length=150, label="Nombre(s)", widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=150, label="Apellidos", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), min_length=8, label="Clave de acceso")
-    confirmar_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="Confirmar clave")
+    password = forms.CharField(widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}), min_length=8, label="Clave de acceso")
+    confirmar_password = forms.CharField(widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}), label="Confirmar clave")
 
     class Meta:
         model = Usuario
@@ -82,6 +170,7 @@ class RegistroPersonalForm(forms.ModelForm):
             raise ValidationError("Las claves de acceso no coinciden.")
         return cleaned_data
 
+
 class RegistroLaboratoristaPublicoForm(forms.ModelForm):
     first_name = forms.CharField(
         max_length=150,
@@ -94,12 +183,12 @@ class RegistroLaboratoristaPublicoForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Hernández López'})
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}),
         min_length=8,
         label="Clave de acceso"
     )
     confirmar_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}),
         label="Confirmar clave"
     )
 
@@ -128,4 +217,5 @@ class RegistroLaboratoristaPublicoForm(forms.ModelForm):
         if cleaned_data.get("password") != cleaned_data.get("confirmar_password"):
             raise ValidationError("Las claves de acceso no coinciden.")
         return cleaned_data
+
     

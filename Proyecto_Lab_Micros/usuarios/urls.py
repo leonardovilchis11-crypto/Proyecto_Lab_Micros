@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     # Pantalla 1: Inicio de sesión
-    path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
+    path('login/', views.login_view, name='login'),
     path('logout/', views.cerrar_sesion, name='logout'),
     path('sesion/continuar/', views.mantener_sesion, name='session_keepalive'),
     
@@ -22,6 +22,7 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='usuarios/recuperar_clave_confirmar.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='usuarios/recuperar_clave_completo.html'), name='password_reset_complete'),
     path('cambiar-clave/', auth_views.PasswordChangeView.as_view(template_name='usuarios/cambiar_clave.html', success_url='/usuarios/mi-cuenta/'), name='password_change'),
+
     # Pantalla 9: Panel de Inicio / Dashboard
     path('inicio/', views.dashboard, name='dashboard'),
 
@@ -32,4 +33,5 @@ urlpatterns = [
     path('padron/', views.padron_usuarios, name='padron_usuarios'),
     path('eliminar/<int:user_id>/', views.eliminar_usuario, name='eliminar_usuario'),
 ]
+
 
