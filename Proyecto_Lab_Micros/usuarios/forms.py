@@ -4,6 +4,25 @@ from django.core.exceptions import ValidationError
 from .models import Usuario
 
 
+def _generar_username_nombre_completo(usuario_obj, first_name, last_name):
+    """Genera un username basado en el nombre completo, evitando duplicados."""
+    nombre_completo = " ".join(
+        parte.strip()
+        for parte in [first_name or "", last_name or ""]
+        if parte and parte.strip()
+    )
+    if not nombre_completo:
+        return getattr(usuario_obj, "username", "") or ""
+
+    base = nombre_completo
+    candidato = base
+    contador = 2
+    while Usuario.objects.filter(username=candidato).exclude(pk=usuario_obj.pk).exists():
+        candidato = f"{base} ({contador})"
+        contador += 1
+    return candidato
+
+
 class LoginForm(forms.Form):
     nombre_usuario = forms.CharField(
         label="Nombre de usuario o nombre",
@@ -11,7 +30,7 @@ class LoginForm(forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'id_nombre_usuario',
-            'placeholder': 'Ej. Leonardo_17 o Leonardo Vilchis',
+            'placeholder': 'Ej. Pablo_V o Pablo Vilchis',
             'autocomplete': 'off',
         }),
     )
@@ -21,7 +40,7 @@ class LoginForm(forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'id_boleta_credencial',
-            'placeholder': 'Ej. 2022350873',
+            'placeholder': 'Ej. 2023350942',
             'autocomplete': 'off',
         }),
     )
@@ -93,7 +112,7 @@ class RegistroAlumnoForm(forms.ModelForm):
     first_name = forms.CharField(
         max_length=150,
         label="Nombre(s)",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Leonardo'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Pablo'})
     )
     last_name = forms.CharField(
         max_length=150,
@@ -140,10 +159,29 @@ class RegistroAlumnoForm(forms.ModelForm):
             raise ValidationError("Las claves de acceso no coinciden.")
         return cleaned_data
 
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.username = _generar_username_nombre_completo(
+            usuario,
+            self.cleaned_data.get("first_name"),
+            self.cleaned_data.get("last_name"),
+        )
+        if commit:
+            usuario.save()
+        return usuario
+
 
 class RegistroPersonalForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=150, label="Nombre(s)", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(max_length=150, label="Apellidos", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(
+        max_length=150,
+        label="Nombre(s)",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Pablo'})
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        label="Apellidos",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Hernández López'})
+    )
     password = forms.CharField(widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}), min_length=8, label="Clave de acceso")
     confirmar_password = forms.CharField(widget=forms.PasswordInput(render_value=True, attrs={'class': 'form-control'}), label="Confirmar clave")
 
@@ -170,12 +208,23 @@ class RegistroPersonalForm(forms.ModelForm):
             raise ValidationError("Las claves de acceso no coinciden.")
         return cleaned_data
 
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.username = _generar_username_nombre_completo(
+            usuario,
+            self.cleaned_data.get("first_name"),
+            self.cleaned_data.get("last_name"),
+        )
+        if commit:
+            usuario.save()
+        return usuario
+
 
 class RegistroLaboratoristaPublicoForm(forms.ModelForm):
     first_name = forms.CharField(
         max_length=150,
         label="Nombre(s)",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Roberto'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Pablo'})
     )
     last_name = forms.CharField(
         max_length=150,
@@ -217,5 +266,17 @@ class RegistroLaboratoristaPublicoForm(forms.ModelForm):
         if cleaned_data.get("password") != cleaned_data.get("confirmar_password"):
             raise ValidationError("Las claves de acceso no coinciden.")
         return cleaned_data
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.username = _generar_username_nombre_completo(
+            usuario,
+            self.cleaned_data.get("first_name"),
+            self.cleaned_data.get("last_name"),
+        )
+        if commit:
+            usuario.save()
+        return usuario
+
 
     
