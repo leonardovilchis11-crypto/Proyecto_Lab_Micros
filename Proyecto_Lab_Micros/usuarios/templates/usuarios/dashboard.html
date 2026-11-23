@@ -94,10 +94,12 @@
                         <a class="nav-link" href="{% url 'catalogo:lista' %}">Catálogo</a>
                         <a class="nav-link" href="{% url 'reservas:carrito' %}">Carrito</a>
                         <a class="nav-link" href="{% url 'reservas:mis_reservas' %}">Mis reservas</a>
+                        <a class="nav-link" href="{% url 'reservas:historial_prestamos' %}">Historial de préstamos</a>
                     {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
                         <a class="nav-link" href="{% url 'dashboard' %}">Inicio</a>
                         <a class="nav-link" href="{% url 'reservas:bandeja_solicitudes' %}">Solicitudes</a>
                         <a class="nav-link" href="{% url 'reservas:devoluciones' %}">Devoluciones</a>
+                        <a class="nav-link" href="{% url 'reservas:historial_prestamos' %}">Historial de préstamos</a>
                         <a class="nav-link" href="{% url 'reservas:reportes_mensuales' %}">Reportes mensuales</a>
                         <a class="nav-link" href="{% url 'inventario:gestion' %}">Inventario</a>
                         {% if usuario.rol == 'ADMINISTRADOR' %}
@@ -221,6 +223,14 @@
                     </div>
                 </div>
 
+                <div class="col">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Historial de Préstamos</h5>
+                        <p class="text-muted small">Consulta tus fechas, materiales utilizados y si cada equipo fue devuelto, dañado o no devuelto.</p>
+                        <a href="{% url 'reservas:historial_prestamos' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ver Historial</a>
+                    </div>
+                </div>
+
             {% elif usuario.rol == 'LABORATORISTA' or usuario.rol == 'ADMINISTRADOR' %}
                 <div class="col">
                     <div class="card card-menu shadow-sm h-100 p-3">
@@ -243,6 +253,14 @@
                         <h5>Reporte de préstamos</h5>
                         <p class="text-muted small">Consulta entregas, límites de devolución y estatus de cada equipo prestado.</p>
                         <a href="{% url 'reservas:reporte_prestamos' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Abrir reporte</a>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card card-menu shadow-sm h-100 p-3">
+                        <h5>Historial de Préstamos</h5>
+                        <p class="text-muted small">Revisa fechas, materiales ocupados, devoluciones, faltantes y reportes de daño de los préstamos.</p>
+                        <a href="{% url 'reservas:historial_prestamos' %}" class="btn text-white mt-auto" style="background-color: #6a1b29;">Ver Historial</a>
                     </div>
                 </div>
 
