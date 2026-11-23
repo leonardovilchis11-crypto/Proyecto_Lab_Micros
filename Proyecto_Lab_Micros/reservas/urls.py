@@ -21,5 +21,7 @@ urlpatterns = [
     ),
     path('devoluciones/', views.vista_devoluciones, name='devoluciones'),
     path('adeudos/', views.vista_adeudos, name='adeudos'),
+    path('historial/', views.vista_historial_prestamos, name='historial_prestamos'),
     path('notificaciones/admin/', views.notificaciones_administrador, name='notificaciones_admin'),
 ]
+

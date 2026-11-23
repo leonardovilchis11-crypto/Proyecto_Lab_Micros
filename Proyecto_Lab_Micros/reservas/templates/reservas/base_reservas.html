@@ -99,6 +99,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'historial_prestamos' %}active{% endif %}"
+                               href="{% url 'reservas:historial_prestamos' %}">
+                                Historial de préstamos
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'mi_cuenta' %}">Mi cuenta</a>
                         </li>
 
@@ -123,6 +129,12 @@
                             <a class="nav-link {% if request.resolver_match.url_name == 'reporte_prestamos' %}active{% endif %}"
                                href="{% url 'reservas:reporte_prestamos' %}">
                                 Reporte de préstamos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'historial_prestamos' %}active{% endif %}"
+                               href="{% url 'reservas:historial_prestamos' %}">
+                                Historial de préstamos
                             </a>
                         </li>
                         <li class="nav-item">
@@ -177,7 +189,7 @@
 
     <!-- Contenido principal de cada vista -->
     <main class="container mt-4 mb-5">
-        {% if request.resolver_match.url_name == 'bandeja_solicitudes' or request.resolver_match.url_name == 'mis_reservas' or request.resolver_match.url_name == 'devoluciones' or request.resolver_match.url_name == 'registrar_prestamo' or request.resolver_match.url_name == 'reporte_prestamos' or request.resolver_match.url_name == 'adeudos' %}
+        {% if request.resolver_match.url_name == 'bandeja_solicitudes' or request.resolver_match.url_name == 'mis_reservas' or request.resolver_match.url_name == 'devoluciones' or request.resolver_match.url_name == 'registrar_prestamo' or request.resolver_match.url_name == 'reporte_prestamos' or request.resolver_match.url_name == 'adeudos' or request.resolver_match.url_name == 'historial_prestamos' %}
             {% include "shared/back_button.html" with fallback_url="/usuarios/inicio/" %}
         {% endif %}
         {% if messages %}
@@ -278,3 +290,4 @@
     </script>
 </body>
 </html>
+

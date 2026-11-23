@@ -1670,4 +1670,190 @@ def notificaciones_administrador(_request):
         })
 
     return JsonResponse({'eventos': eventos})
+@login_required
+def vista_historial_prestamos(request):
+    """Historial unificado de préstamos para Alumno, Laboratorista y Administrador."""
+    es_operador = _es_operador(request.user)
+    query = request.GET.get('q', '').strip().lower()
+    estado_filtro = request.GET.get('estado', '').strip()
+    fecha_filtro = request.GET.get('fecha', '').strip()
+
+    fecha_obj = None
+    if fecha_filtro:
+        try:
+            fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d').date()
+        except ValueError:
+            messages.error(request, 'El formato de fecha del filtro no es válido.')
+
+    solicitudes_qs = SolicitudPrestamo.objects.select_related('alumno').order_by('-creada')
+    if not es_operador:
+        solicitudes_qs = solicitudes_qs.filter(alumno=request.user)
+
+    solicitudes = list(solicitudes_qs)
+    adeudos_por_pieza = {}
+    for adeudo in Adeudo.objects.filter(solicitud__in=solicitudes):
+        adeudos_por_pieza[(adeudo.solicitud_id, adeudo.id_material)] = adeudo
+
+    ahora = timezone.localtime()
+    registros = []
+
+    for solicitud in solicitudes:
+        alumno_nombre = _nombre_usuario(solicitud.alumno)
+        boleta = solicitud.alumno.boleta_credencial
+        equipos_lista = solicitud.equipos if isinstance(solicitud.equipos, list) else []
+
+        if not equipos_lista:
+            equipos_lista = [{
+                'nombre': 'Sin detalle de equipo',
+                'id_unico': '',
+                'cantidad': 1,
+            }]
+
+        for equipo in equipos_lista:
+            if not isinstance(equipo, dict):
+                continue
+
+            id_material = str(equipo.get('id_unico', '')).strip()
+            nombre_material = equipo.get('nombre', 'Equipo de laboratorio')
+            cantidad = equipo.get('cantidad', 1)
+
+            try:
+                entrega = datetime.fromisoformat(equipo.get('fecha_prestamo', ''))
+                if timezone.is_naive(entrega):
+                    entrega = timezone.make_aware(entrega)
+                entrega = timezone.localtime(entrega)
+            except (TypeError, ValueError):
+                entrega = timezone.localtime(solicitud.creada) if solicitud.creada else None
+
+            try:
+                devolucion = datetime.fromisoformat(equipo.get('fecha_devolucion', ''))
+                if timezone.is_naive(devolucion):
+                    devolucion = timezone.make_aware(devolucion)
+                devolucion = timezone.localtime(devolucion)
+            except (TypeError, ValueError):
+                devolucion = None
+
+            try:
+                limite = datetime.fromisoformat(equipo.get('fecha_limite', ''))
+                if timezone.is_naive(limite):
+                    limite = timezone.make_aware(limite)
+                limite = timezone.localtime(limite)
+            except (TypeError, ValueError):
+                limite = None
+
+            adeudo = adeudos_por_pieza.get((solicitud.pk, id_material))
+            estado_devolucion = equipo.get('estatus_devolucion', '')
+            devuelto = bool(equipo.get('devuelto'))
+
+            if adeudo and adeudo.tipo == Adeudo.Tipo.DANADO:
+                resultado = 'DANADO'
+                etiqueta_estado = (
+                    'Dañado (Adeudo activo)'
+                    if adeudo.estatus == Adeudo.Estatus.ACTIVO
+                    else 'Dañado (Adeudo liquidado)'
+                )
+                detalle = adeudo.motivo or equipo.get('observaciones_devolucion', '')
+            elif estado_devolucion == 'DANADO':
+                resultado = 'DANADO'
+                etiqueta_estado = 'Dañado'
+                detalle = equipo.get('observaciones_devolucion', '')
+            elif adeudo and adeudo.tipo == Adeudo.Tipo.NO_DEVUELTO:
+                resultado = 'NO_DEVUELTO'
+                etiqueta_estado = (
+                    'No devuelto (Adeudo activo)'
+                    if adeudo.estatus == Adeudo.Estatus.ACTIVO
+                    else 'No devuelto (Adeudo liquidado)'
+                )
+                detalle = adeudo.motivo or 'Préstamo no devuelto dentro del plazo.'
+            elif (
+                solicitud.estatus == SolicitudPrestamo.Estatus.ATENDIDA
+                and equipo.get('prestamo_activo')
+                and not devuelto
+                and limite
+                and limite <= ahora
+            ):
+                resultado = 'NO_DEVUELTO'
+                etiqueta_estado = 'No devuelto / Vencido'
+                detalle = equipo.get('observaciones_devolucion', 'Plazo de devolución vencido.')
+            elif devuelto or (
+                solicitud.estatus == SolicitudPrestamo.Estatus.ATENDIDA
+                and not equipo.get('prestamo_activo')
+            ):
+                resultado = 'DEVUELTO'
+                etiqueta_estado = (
+                    'Devuelto a mantenimiento'
+                    if estado_devolucion == 'MANTENIMIENTO'
+                    else 'Devuelto'
+                )
+                detalle = equipo.get('observaciones_devolucion', '')
+            elif solicitud.estatus == SolicitudPrestamo.Estatus.ATENDIDA:
+                resultado = 'ACTIVO'
+                etiqueta_estado = 'En préstamo'
+                detalle = f"Bloque: {solicitud.bloque}"
+            elif solicitud.estatus == SolicitudPrestamo.Estatus.CANCELADA:
+                resultado = 'CANCELADA'
+                etiqueta_estado = 'Cancelada'
+                detalle = f"Bloque: {solicitud.bloque}"
+            else:
+                resultado = 'PENDIENTE'
+                etiqueta_estado = solicitud.get_estatus_display()
+                detalle = f"Fecha reservada: {solicitud.fecha.strftime('%d/%m/%Y')} ({solicitud.bloque})"
+
+            if fecha_obj:
+                fechas_comparar = {solicitud.fecha}
+                if entrega:
+                    fechas_comparar.add(entrega.date())
+                if devolucion:
+                    fechas_comparar.add(devolucion.date())
+                if fecha_obj not in fechas_comparar:
+                    continue
+
+            if estado_filtro and resultado != estado_filtro:
+                continue
+
+            if query:
+                texto_busqueda = ' '.join((
+                    solicitud.folio,
+                    alumno_nombre,
+                    boleta,
+                    nombre_material,
+                    id_material,
+                    etiqueta_estado,
+                    detalle,
+                )).lower()
+                if query not in texto_busqueda:
+                    continue
+
+            registros.append({
+                'folio': solicitud.folio,
+                'alumno_nombre': alumno_nombre,
+                'matricula': boleta,
+                'material_nombre': nombre_material,
+                'id_material': id_material,
+                'cantidad': cantidad,
+                'fecha_prestamo': entrega,
+                'fecha_devolucion': devolucion,
+                'fecha_limite': limite,
+                'resultado': resultado,
+                'etiqueta_estado': etiqueta_estado,
+                'detalle': detalle,
+                'tiene_adeudo': adeudo is not None,
+            })
+
+    resumen = {
+        'total': len(registros),
+        'devueltos': sum(1 for r in registros if r['resultado'] == 'DEVUELTO'),
+        'no_devueltos': sum(1 for r in registros if r['resultado'] == 'NO_DEVUELTO'),
+        'danados': sum(1 for r in registros if r['resultado'] == 'DANADO'),
+    }
+
+    return render(request, 'reservas/historial_prestamos.html', {
+        'registros': registros,
+        'resumen': resumen,
+        'es_operador': es_operador,
+        'query': request.GET.get('q', ''),
+        'estado_sel': estado_filtro,
+        'fecha_sel': fecha_filtro,
+    })
+
 
