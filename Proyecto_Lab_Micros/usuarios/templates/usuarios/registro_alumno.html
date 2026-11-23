@@ -2,6 +2,43 @@
 
 {% block title %}Registro de Alumnos - ESIME{% endblock %}
 
+{% block extra_css %}
+<style>
+    .card-registro-alumno {
+        max-width: 540px;
+        border-top: 4px solid #6a1b29 !important;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-ipn {
+            padding: 0.7rem 1rem !important;
+        }
+        .navbar-ipn .navbar-brand {
+            font-size: 1rem !important;
+            white-space: normal;
+        }
+        .card-registro-alumno {
+            padding: 1.25rem !important;
+        }
+        .card-registro-alumno input.form-control,
+        .card-registro-alumno input[type="text"],
+        .card-registro-alumno input[type="email"],
+        .card-registro-alumno input[type="password"],
+        .card-registro-alumno input[type="number"],
+        .card-registro-alumno select.form-select,
+        .card-registro-alumno select,
+        .card-registro-alumno .btn {
+            font-size: 16px !important;
+            padding: 0.65rem 0.9rem !important;
+        }
+        .card-registro-alumno .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block navbar %}
     {% include "shared/brand_logos.html" %}
     <nav class="navbar navbar-ipn px-4 py-2">
@@ -10,9 +47,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-5" style="max-width: 540px;">
-    <div class="card shadow p-4 border-top border-4" style="border-color: #6a1b29 !important;">
-        <h3 class="text-center mb-2" style="color: #6a1b29;">Registro de Alumno</h3>
+<div class="container card-registro-alumno px-3 mt-3 mt-sm-4 mb-5">
+    <div class="card shadow p-3 p-sm-4">
+        <h3 class="h4 text-center mb-2" style="color: #6a1b29;">Registro de Alumno</h3>
         <p class="text-muted small text-center mb-4">
             Requiere boleta de 10 dígitos y correo institucional <code>@alumno.ipn.mx</code>.
         </p>

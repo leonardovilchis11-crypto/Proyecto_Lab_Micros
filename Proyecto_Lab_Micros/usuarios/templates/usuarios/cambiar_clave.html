@@ -30,18 +30,30 @@
             color: #dc3545;
             font-weight: 500;
         }
-        @media (max-width: 576px) {
-            input.form-control, .btn {
+        @media (max-width: 768px) {
+            body {
+                font-size: 15px;
+            }
+            .card {
+                padding: 1.25rem !important;
+            }
+            input.form-control,
+            select.form-select,
+            .input-group-text,
+            .btn {
                 font-size: 16px !important;
                 padding: 0.65rem 0.9rem !important;
+            }
+            .input-group .btn {
+                min-height: 44px;
             }
         }
     </style>
 </head>
 <body class="bg-light pb-5">
     {% include "shared/brand_logos.html" %}
-    <div class="container mt-4 mt-md-5" style="max-width: 460px;">
-        <div class="card shadow p-4 border-top border-4" style="border-color: #6a1b29 !important;">
+    <div class="container px-3 mt-3 mt-md-5" style="max-width: 460px;">
+        <div class="card shadow p-3 p-sm-4 border-top border-4" style="border-color: #6a1b29 !important;">
             <h4 class="text-center mb-3" style="color: #6a1b29;">Actualizar Clave de Acceso</h4>
             <form method="post">
                 {% csrf_token %}
@@ -82,4 +94,3 @@
     </script>
 </body>
 </html>
-

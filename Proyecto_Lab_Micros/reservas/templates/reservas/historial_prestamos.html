@@ -15,11 +15,11 @@
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label for="hist_q" class="form-label fw-semibold">Buscar por folio, material o matrícula</label>
                 <input id="hist_q" type="text" name="q" value="{{ query|default:'' }}" class="form-control" placeholder="Ej. RES-1004, ESP32, 2022...">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label for="hist_estado" class="form-label fw-semibold">Estado / incidencia</label>
                 <select id="hist_estado" name="estado" class="form-select">
                     <option value="">Todos</option>
@@ -31,20 +31,20 @@
                     <option value="CANCELADA" {% if estado_sel == 'CANCELADA' %}selected{% endif %}>Cancelada</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label for="hist_fecha" class="form-label fw-semibold">Fecha</label>
                 <input id="hist_fecha" type="date" name="fecha" value="{{ fecha_sel|default:'' }}" class="form-control">
             </div>
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-12 col-md-2 d-flex flex-column flex-sm-row gap-2">
                 <button type="submit" class="btn btn-guinda w-100">Filtrar</button>
-                <a href="{% url 'reservas:historial_prestamos' %}" class="btn btn-outline-secondary">Limpiar</a>
+                <a href="{% url 'reservas:historial_prestamos' %}" class="btn btn-outline-secondary w-100">Limpiar</a>
             </div>
         </form>
     </div>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+    <div class="col">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="small text-muted">Total registros</div>
@@ -52,7 +52,7 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="small text-muted">Devueltos</div>
@@ -60,7 +60,7 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="small text-muted">No devueltos</div>
@@ -68,7 +68,7 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="small text-muted">Dañados</div>
@@ -84,7 +84,7 @@
     </div>
 
     {% if not registros %}
-        <div class="text-center py-5">
+        <div class="text-center py-5 px-3">
             <p class="fs-5 fw-semibold text-muted mb-1">No hay registros en el historial de préstamos</p>
             <p class="text-muted small mb-0">Aquí aparecerán las fechas, materiales ocupados y el estado de devolución o incidencia.</p>
         </div>

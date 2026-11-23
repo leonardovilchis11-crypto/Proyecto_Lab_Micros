@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Laboratorio de Microcontroladores — ESIME Culhuacán{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -11,8 +12,8 @@
         }
         body {
             background-color: #f8f9fa;
-            padding-bottom: 60px;
-            font-size: 15px;
+            padding-bottom: 68px;
+            font-size: 16px;
         }
         .navbar-custom {
             background-color: var(--ipn-guinda);
@@ -39,7 +40,7 @@
             background-color: #fff3cd;
             border-bottom: 1px solid #ffe69c;
             color: #664d03;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
         }
         .btn-guinda {
             background-color: var(--ipn-guinda);
@@ -58,13 +59,50 @@
             width: 100%;
             z-index: 1030;
         }
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px;
+                padding-bottom: 76px;
+            }
+            .navbar-brand {
+                font-size: 1.05rem !important;
+                white-space: normal !important;
+            }
+            .navbar-custom .nav-link {
+                font-size: 1rem !important;
+                padding: 8px 10px !important;
+            }
+            .card.card-auth,
+            .card.card-compact {
+                width: 94% !important;
+                max-width: 480px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            input.form-control, select.form-select, textarea.form-control, .btn {
+                font-size: 16px !important;
+                padding: 0.65rem 0.9rem !important;
+            }
+            .table-responsive .table {
+                min-width: 620px;
+                font-size: 0.95rem;
+            }
+            .table-responsive .table th,
+            .table-responsive .table td {
+                padding: 0.75rem 0.65rem;
+            }
+            .institutional-logo-ipn, .institutional-logo-esime {
+                max-height: 45px !important;
+                width: auto !important;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     {% include "shared/brand_logos.html" %}
     <!-- Barra de navegación principal según el perfil (Req. 1.1.2) -->
-    <nav class="navbar navbar-expand-lg navbar-custom px-4 py-2 shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-custom px-3 px-md-4 py-2 shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" href="/usuarios/inicio/">
                 ESIME Culhuacán — Lab. Microcontroladores
@@ -74,7 +112,7 @@
             </button>
 
             <div class="collapse navbar-collapse" id="menuPrincipal">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
                     {% if request.user.rol == 'ALUMNO' %}
                         <!-- MENÚ EXCLUSIVO ALUMNO (Req. 1.1.2) -->
                         <li class="nav-item">
@@ -168,8 +206,8 @@
                 </ul>
 
                 <!-- Usuario activo en sesión y Cerrar Sesión -->
-                <div class="d-flex align-items-center">
-                    <span class="text-white me-3 small">
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-2 mt-lg-0">
+                    <span class="text-white small">
                         Hola, <strong>{{ request.user.first_name|default:request.user.boleta_credencial }}</strong>
                         ({{ request.user.get_rol_display }})
                     </span>
@@ -205,7 +243,7 @@
     </main>
 
     <!-- Pie de página institucional -->
-    <footer class="footer-custom text-center py-2">
+    <footer class="footer-custom text-center py-2 px-2">
         <small>Instituto Politécnico Nacional — Laboratorio de Microcontroladores</small>
     </footer>
 

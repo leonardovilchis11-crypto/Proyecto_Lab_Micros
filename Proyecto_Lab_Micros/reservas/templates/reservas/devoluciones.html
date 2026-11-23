@@ -10,16 +10,16 @@
 
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
-        <form method="post" class="row g-2 align-items-end sin-aviso">
+        <form method="post" class="row g-3 align-items-end sin-aviso">
             {% csrf_token %}
             <input type="hidden" name="accion" value="buscar">
-            <div class="col-md-9">
+            <div class="col-12 col-md-9">
                 <label for="boleta" class="form-label fw-semibold">Código de barras / boleta del alumno</label>
-                <input id="boleta" name="boleta" value="{{ entrada|default:boleta }}" class="form-control form-control-lg"
+                <input id="boleta" name="boleta" value="{{ entrada|default:boleta }}" class="form-control"
                        placeholder="Escanea o escribe la boleta" autocomplete="off" autofocus>
             </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-guinda btn-lg w-100">Buscar préstamo</button>
+            <div class="col-12 col-md-3">
+                <button type="submit" class="btn btn-guinda w-100">Buscar préstamo</button>
             </div>
         </form>
     </div>
@@ -27,12 +27,12 @@
 
 {% if prestamo %}
 <div class="row g-4 mb-4">
-    <div class="col-lg-5">
+    <div class="col-12 col-lg-5">
         <section class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <h3 class="h6 fw-bold text-uppercase text-secondary border-bottom pb-2">Datos del alumno</h3>
                 <div class="d-flex align-items-center gap-3 mt-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
                          style="background-color: var(--ipn-guinda); width: 48px; height: 48px;">
                         {% if alumno %}{{ alumno.first_name|first|upper }}{% else %}A{% endif %}
                     </div>
@@ -51,7 +51,7 @@
         </section>
     </div>
 
-    <div class="col-lg-7">
+    <div class="col-12 col-lg-7">
         <section class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <h3 class="h6 fw-bold text-uppercase text-secondary border-bottom pb-2">Detalle del préstamo</h3>
@@ -94,7 +94,7 @@
                 <span class="badge text-bg-warning align-self-start">Prestado</span>
             </div>
             <div class="row g-3">
-                <div class="col-md-5">
+                <div class="col-12 col-md-5">
                     <label for="estado_{{ articulo.id }}" class="form-label fw-semibold">Estado de devolución</label>
                     <select id="estado_{{ articulo.id }}" name="estado_{{ articulo.id }}"
                             class="form-select estado-devolucion" required>
@@ -103,7 +103,7 @@
                         <option value="DANADO" {% if articulo.estado_seleccionado == 'DANADO' %}selected{% endif %}>Dañado</option>
                     </select>
                 </div>
-                <div class="col-md-7">
+                <div class="col-12 col-md-7">
                     <label for="observaciones_{{ articulo.id }}" class="form-label fw-semibold">
                         Observaciones <span class="text-muted fw-normal">(obligatorias si requiere atención)</span>
                     </label>
@@ -115,7 +115,7 @@
         </section>
         {% endfor %}
 
-        <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 pt-2">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-end align-items-sm-center gap-3 pt-2">
             <span class="small text-muted">Las fallas se registrarán en el historial y el inventario se actualizará por pieza.</span>
             <button type="submit" class="btn btn-danger px-4">Registrar devolución</button>
         </div>
@@ -183,3 +183,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 {% endblock %}
+

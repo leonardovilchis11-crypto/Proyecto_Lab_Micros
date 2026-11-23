@@ -15,11 +15,11 @@
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-5">
+            <div class="col-12 col-md-5">
                 <label for="filtro_q" class="form-label small fw-semibold">Buscar por alumno o boleta</label>
                 <input type="text" id="filtro_q" name="q" value="{{ query }}" class="form-control" placeholder="Ej. Carlos Mendoza o 2023301452">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label for="filtro_estatus" class="form-label small fw-semibold">Estatus</label>
                 <select id="filtro_estatus" name="estatus" class="form-select">
                     <option value="">Todos los estatus</option>
@@ -29,13 +29,13 @@
                     <option value="CANCELADA" {% if estatus_sel == "CANCELADA" %}selected{% endif %}>Cancelada</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-sm-6 col-md-2">
                 <label for="filtro_fecha" class="form-label small fw-semibold">Fecha</label>
                 <input type="date" id="filtro_fecha" name="fecha" value="{{ fecha_sel }}" class="form-control" lang="es-MX">
             </div>
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-12 col-md-2 d-flex flex-column flex-sm-row gap-2">
                 <button type="submit" class="btn btn-guinda w-100">Filtrar</button>
-                <a href="{% url 'reservas:bandeja_solicitudes' %}" class="btn btn-outline-secondary">Limpiar</a>
+                <a href="{% url 'reservas:bandeja_solicitudes' %}" class="btn btn-outline-secondary w-100">Limpiar</a>
             </div>
         </form>
     </div>
@@ -45,7 +45,7 @@
 <div class="card shadow-sm border-0">
     <div class="card-body p-0">
         {% if not solicitudes %}
-        <div class="text-center py-5">
+        <div class="text-center py-5 px-3">
             <p class="fs-5 fw-semibold text-muted mb-2">No se encontraron solicitudes o reservas</p>
             <p class="text-muted mb-3">No hay registros pendientes que coincidan con los filtros seleccionados.</p>
             <a href="{% url 'reservas:bandeja_solicitudes' %}" class="btn btn-outline-primary btn-sm">Mostrar todas las solicitudes</a>
@@ -88,8 +88,8 @@
                         </td>
                         <td class="text-end pe-3">
                             {% if s.estatus == 'CONFIRMADA' or s.estatus == 'SIN_CONFIRMAR' %}
-                            <div class="d-inline-flex gap-1">
-                                <form method="post" action="{% url 'reservas:bandeja_solicitudes' %}">
+                            <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+                                <form method="post" action="{% url 'reservas:bandeja_solicitudes' %}" class="d-inline">
                                     {% csrf_token %}
                                     <input type="hidden" name="folio" value="{{ s.folio }}">
                                     <input type="hidden" name="accion" value="atender">
@@ -151,3 +151,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 {% endblock %}
+

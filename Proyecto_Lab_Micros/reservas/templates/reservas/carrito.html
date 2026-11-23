@@ -3,7 +3,7 @@
 {% block title %}Carrito de Solicitudes — ESIME Culhuacán{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
     <div>
         <h2 class="fw-bold mb-1" style="color: #6a1b29;">Carrito de Solicitudes y Reserva</h2>
         <p class="text-muted mb-0">Revisa los materiales agregados desde el catálogo, ajusta cantidades y programa tu horario de práctica.</p>
@@ -47,7 +47,7 @@
 
 <div class="row g-4">
     <!-- Columna izquierda: Listado editable de artículos (Req. 3.3.1) -->
-    <div class="col-lg-7">
+    <div class="col-12 col-lg-7">
         <div class="card shadow-sm border-0" style="border-top: 4px solid #6a1b29 !important;">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold">Equipos en tu solicitud</h5>
@@ -56,12 +56,12 @@
             <div class="card-body">
                 {% if carrito %}
                     <div class="table-responsive">
-                        <table class="table align-middle">
+                        <table class="table align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th>Código</th>
                                     <th>Material / Equipo</th>
-                                    <th style="width: 150px;">Cantidad</th>
+                                    <th style="min-width: 150px;">Cantidad</th>
                                     <th class="text-end">Quitar</th>
                                 </tr>
                             </thead>
@@ -75,7 +75,7 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="accion" value="actualizar_cantidad">
                                             <input type="hidden" name="item_id" value="{{ item.id }}">
-                                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="20" class="form-control form-control-sm text-center">
+                                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="20" class="form-control form-control-sm text-center" style="min-width: 68px;">
                                             <button type="submit" class="btn btn-sm btn-outline-dark" title="Actualizar">OK</button>
                                         </form>
                                     </td>
@@ -93,7 +93,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <div class="text-center py-5">
+                    <div class="text-center py-5 px-3">
                         <p class="text-muted mb-3">Tu carrito de solicitudes está vacío actualmente.</p>
                         <a href="{% url 'catalogo:lista' %}" class="btn btn-guinda">
                             Ir al Catálogo de Equipos
@@ -105,7 +105,7 @@
     </div>
 
     <!-- Columna derecha: Fecha hábil, bloque horario y reglamento (Req. 1.6, 3.1, 3.4, 4.0) -->
-    <div class="col-lg-5">
+    <div class="col-12 col-lg-5">
         <div class="card shadow-sm border-0" style="border-top: 4px solid #6a1b29 !important;">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 fw-bold">Programación de Reserva y Confirmación</h5>
@@ -215,3 +215,4 @@
     }
 </script>
 {% endblock %}
+

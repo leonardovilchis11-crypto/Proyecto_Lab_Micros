@@ -10,6 +10,22 @@
     .notificacion-admin {
         box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .18);
     }
+    @media (max-width: 768px) {
+        .notificaciones-admin {
+            top: 0.75rem;
+            right: 0.75rem;
+            left: 0.75rem;
+            width: auto;
+        }
+        .notificacion-admin {
+            font-size: 0.95rem;
+            padding-right: 2.5rem;
+        }
+        .notificacion-admin .btn-close {
+            padding: 0.85rem;
+            font-size: 0.9rem;
+        }
+    }
 </style>
 <script>
 (function () {
@@ -66,3 +82,4 @@
     window.setInterval(consultar, 15000);
 })();
 </script>
+

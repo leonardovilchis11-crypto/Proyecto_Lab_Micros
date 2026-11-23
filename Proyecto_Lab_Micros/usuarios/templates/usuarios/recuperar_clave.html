@@ -2,11 +2,42 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Recuperar Clave - ESIME</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-custom { background-color: #6a1b29; color: white; }
-        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; z-index: 1030; }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 15px;
+                padding-bottom: 72px;
+            }
+            .navbar-custom {
+                padding: 0.7rem 1rem !important;
+            }
+            .navbar-custom .navbar-brand {
+                font-size: 1rem !important;
+                white-space: normal;
+            }
+            .card {
+                padding: 1.25rem !important;
+            }
+            input.form-control,
+            .btn {
+                font-size: 16px !important;
+                padding: 0.65rem 0.9rem !important;
+            }
+            .footer-custom {
+                padding: 0.5rem 0.75rem !important;
+            }
+            .footer-custom small {
+                font-size: 0.75rem;
+                line-height: 1.25;
+                display: block;
+            }
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -15,9 +46,9 @@
         <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán — Recuperación de Acceso</span>
     </nav>
 
-    <div class="container mt-5 mb-5" style="max-width: 480px;">
-        <div class="card shadow p-4 border-top border-4" style="border-color: #6a1b29 !important;">
-            <h3 class="text-center mb-3" style="color: #6a1b29;">Recuperar Acceso</h3>
+    <div class="container px-3 mt-4 mt-sm-5 mb-5" style="max-width: 480px;">
+        <div class="card shadow p-3 p-sm-4 border-top border-4" style="border-color: #6a1b29 !important;">
+            <h3 class="h4 text-center mb-3" style="color: #6a1b29;">Recuperar Acceso</h3>
             <p class="text-muted small text-center mb-4">
                 Ingresa tu boleta o credencial y tu correo institucional registrado para enviarte las instrucciones de restablecimiento.
             </p>
@@ -52,3 +83,4 @@
     </footer>
 </body>
 </html>
+

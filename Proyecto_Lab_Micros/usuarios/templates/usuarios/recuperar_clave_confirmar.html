@@ -2,25 +2,61 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nueva Contraseña - ESIME / IPN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-custom { background-color: #6a1b29; color: white; }
-        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+        .footer-custom { background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; z-index: 1030; }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 15px;
+                padding-bottom: 72px;
+            }
+            .navbar-custom {
+                padding: 0.7rem 1rem !important;
+                gap: 0.4rem;
+            }
+            .navbar-custom .navbar-brand {
+                font-size: 0.95rem !important;
+                white-space: normal;
+            }
+            .navbar-custom .btn {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.65rem;
+            }
+            .card-body {
+                padding: 1.25rem !important;
+            }
+            input.form-control,
+            .btn {
+                font-size: 16px !important;
+                padding: 0.65rem 0.9rem !important;
+            }
+            .footer-custom {
+                padding: 0.5rem 0.75rem !important;
+            }
+            .footer-custom small {
+                font-size: 0.75rem;
+                line-height: 1.25;
+                display: block;
+            }
+        }
     </style>
 </head>
 <body class="bg-light">
     {% include "shared/brand_logos.html" %}
-    <nav class="navbar navbar-custom px-4 py-2">
+    <nav class="navbar navbar-custom flex-wrap justify-content-between align-items-center px-4 py-2">
         <span class="navbar-brand mb-0 h1 text-white">ESIME Culhuacán — Restablecer Contraseña</span>
         <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Ir al Inicio de Sesión</a>
     </nav>
 
-    <div class="container py-5 mb-5">
+    <div class="container px-3 py-4 py-sm-5 mb-5">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-12 col-md-8 col-lg-6">
                 <div class="card shadow border-0 border-top border-4" style="border-color: #6a1b29 !important;">
-                    <div class="card-body p-4">
+                    <div class="card-body p-3 p-sm-4">
                         <h4 class="card-title mb-3 fw-bold" style="color: #6a1b29;">Establecer nueva contraseña</h4>
 
                         {% if validlink %}

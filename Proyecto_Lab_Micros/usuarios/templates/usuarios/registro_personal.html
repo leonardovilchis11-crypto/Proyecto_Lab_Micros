@@ -2,19 +2,85 @@
 
 {% block title %}Alta de Personal - ESIME{% endblock %}
 
+{% block extra_css %}
+<style>
+    .card-alta-personal {
+        max-width: 500px;
+        border-top: 4px solid #6a1b29 !important;
+    }
+    .card-alta-personal form p {
+        margin-bottom: 1rem;
+    }
+    .card-alta-personal form p label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+    }
+    .card-alta-personal form ul {
+        font-size: 0.875rem;
+        color: #555;
+        padding-left: 1.2rem;
+        margin-top: 0.4rem;
+    }
+    .card-alta-personal form .helptext {
+        display: block;
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.35rem;
+    }
+    .card-alta-personal form ul.errorlist {
+        color: #dc3545;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-ipn {
+            padding: 0.7rem 1rem !important;
+            gap: 0.4rem;
+        }
+        .navbar-ipn .navbar-brand {
+            font-size: 0.95rem !important;
+            white-space: normal;
+        }
+        .navbar-ipn .btn {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.65rem;
+        }
+        .card-alta-personal {
+            padding: 1.25rem !important;
+        }
+        .card-alta-personal input.form-control,
+        .card-alta-personal input[type="text"],
+        .card-alta-personal input[type="email"],
+        .card-alta-personal input[type="password"],
+        .card-alta-personal input[type="number"],
+        .card-alta-personal select.form-select,
+        .card-alta-personal select,
+        .card-alta-personal .btn {
+            font-size: 16px !important;
+            padding: 0.65rem 0.9rem !important;
+        }
+        .card-alta-personal .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block navbar %}
     {% include "shared/brand_logos.html" %}
-    <nav class="navbar navbar-ipn px-4 py-2">
+    <nav class="navbar navbar-ipn flex-wrap justify-content-between align-items-center px-4 py-2">
         <span class="navbar-brand mb-0 h1 text-white">Administración — Alta de Personal</span>
         <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">Volver al Inicio</a>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-5" style="max-width: 500px;">
-    <div class="card shadow p-4 border-top border-4" style="border-color: #6a1b29 !important;">
+<div class="container card-alta-personal px-3 mt-3 mt-sm-4 mb-5">
+    <div class="card shadow p-3 p-sm-4">
         <h4 class="text-center mb-3" style="color: #6a1b29;">Registrar Personal Operativo</h4>
-        <form method="post">
+        <form method="post" novalidate>
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-guinda w-100 mt-3">Guardar Personal</button>

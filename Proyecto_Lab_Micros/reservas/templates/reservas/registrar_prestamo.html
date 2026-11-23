@@ -10,6 +10,20 @@
     .progreso-1 { width: 33%; }
     .progreso-2 { width: 66%; }
     .progreso-3 { width: 100%; }
+
+    @media (max-width: 768px) {
+        .paso-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left !important;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .unidad-equipo label {
+            padding: 0.85rem !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -25,17 +39,17 @@
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
         <div class="row text-center g-2">
-            <div class="col-md-4 {% if paso > 1 %}paso-completo{% elif paso == 1 %}paso-activo{% else %}text-muted{% endif %}">
+            <div class="col-12 col-md-4 paso-item {% if paso > 1 %}paso-completo{% elif paso == 1 %}paso-activo{% else %}text-muted{% endif %}">
                 <span class="badge rounded-pill {% if paso == 1 %}text-bg-danger{% elif paso > 1 %}text-bg-success{% else %}text-bg-secondary{% endif %}">1</span>
-                Identificación del alumno
+                <span>Identificación del alumno</span>
             </div>
-            <div class="col-md-4 {% if paso > 2 %}paso-completo{% elif paso == 2 %}paso-activo{% else %}text-muted{% endif %}">
+            <div class="col-12 col-md-4 paso-item {% if paso > 2 %}paso-completo{% elif paso == 2 %}paso-activo{% else %}text-muted{% endif %}">
                 <span class="badge rounded-pill {% if paso == 2 %}text-bg-danger{% elif paso > 2 %}text-bg-success{% else %}text-bg-secondary{% endif %}">2</span>
-                Selección de equipos
+                <span>Selección de equipos</span>
             </div>
-            <div class="col-md-4 {% if paso == 3 %}paso-activo{% else %}text-muted{% endif %}">
+            <div class="col-12 col-md-4 paso-item {% if paso == 3 %}paso-activo{% else %}text-muted{% endif %}">
                 <span class="badge rounded-pill {% if paso == 3 %}text-bg-danger{% else %}text-bg-secondary{% endif %}">3</span>
-                Confirmación y comprobante
+                <span>Confirmación y comprobante</span>
             </div>
         </div>
         <div class="progress mt-3" role="progressbar" aria-label="Progreso del préstamo" aria-valuenow="{{ paso }}" aria-valuemin="1" aria-valuemax="3">
@@ -46,7 +60,7 @@
 
 {% if paso == 1 %}
 <section class="card shadow-sm border-0">
-    <div class="card-body p-4">
+    <div class="card-body p-3 p-sm-4">
         <h3 class="h5 fw-bold">Paso 1. Identificación y validación</h3>
         <p class="text-muted">Ingresa la boleta del alumno. Se revisará que no tenga sanciones ni préstamos pendientes.</p>
         {% if folio %}
@@ -58,17 +72,19 @@
             <input type="hidden" name="folio" value="{{ folio }}">
             <div class="mb-4">
                 <label for="buscadorVentana" class="form-label fw-semibold">Boleta del alumno</label>
-                <input id="buscadorVentana" name="boleta" value="{{ boleta }}" class="form-control form-control-lg"
+                <input id="buscadorVentana" name="boleta" value="{{ boleta }}" class="form-control"
                        inputmode="numeric" autocomplete="off" placeholder="Escanea o escribe la boleta" required autofocus>
             </div>
-            <button type="submit" id="accionPrincipal" class="btn btn-guinda px-4">Validar alumno y continuar <span class="small">(F2)</span></button>
+            <button type="submit" id="accionPrincipal" class="btn btn-guinda px-4 w-100 w-sm-auto">
+                Validar alumno y continuar <span class="small d-none d-md-inline">(F2)</span>
+            </button>
         </form>
     </div>
 </section>
 
 {% elif paso == 2 %}
 <section class="card shadow-sm border-0">
-    <div class="card-body p-4">
+    <div class="card-body p-3 p-sm-4">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
             <div>
                 <h3 class="h5 fw-bold mb-1">Paso 2. Selección de equipos</h3>
@@ -89,7 +105,9 @@
         {% endif %}
 
         <div class="mb-3">
-            <label for="buscarEquipo" class="form-label fw-semibold">Buscar equipo o identificador (Ctrl+B)</label>
+            <label for="buscarEquipo" class="form-label fw-semibold">
+                Buscar equipo o identificador <span class="d-none d-md-inline">(Ctrl+B)</span>
+            </label>
             <input id="buscarEquipo" type="search" class="form-control" placeholder="Filtrar por nombre o código">
         </div>
 
@@ -98,9 +116,9 @@
             <input type="hidden" name="accion" value="seleccionar_equipos">
             <div class="row g-2 mb-4" id="listaEquipos">
                 {% for unidad in unidades_disponibles %}
-                <div class="col-md-6 unidad-equipo" data-filtro="{{ unidad.nombre|lower }} {{ unidad.id_unico|lower }}">
+                <div class="col-12 col-md-6 unidad-equipo" data-filtro="{{ unidad.nombre|lower }} {{ unidad.id_unico|lower }}">
                     <label class="border rounded p-3 d-flex gap-2 h-100 w-100">
-                        <input class="form-check-input mt-1" type="checkbox" name="equipo_ids" value="{{ unidad.id }}"
+                        <input class="form-check-input mt-1 flex-shrink-0" type="checkbox" name="equipo_ids" value="{{ unidad.id }}"
                                {% if unidad.id|stringformat:'s' in equipo_ids %}checked{% endif %}>
                         <span>
                             <strong class="d-block">{{ unidad.nombre }}</strong>
@@ -113,9 +131,11 @@
                 <div class="col-12"><div class="alert alert-warning mb-0">No hay unidades disponibles para la selección.</div></div>
                 {% endfor %}
             </div>
-            <div class="d-flex flex-wrap justify-content-between gap-2">
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
                 <a class="btn btn-outline-secondary" href="?paso=1">Volver</a>
-                <button type="submit" id="accionPrincipal" class="btn btn-guinda px-4">Continuar a confirmación <span class="small">(F2)</span></button>
+                <button type="submit" id="accionPrincipal" class="btn btn-guinda px-4">
+                    Continuar a confirmación <span class="small d-none d-md-inline">(F2)</span>
+                </button>
             </div>
         </form>
     </div>
@@ -123,17 +143,17 @@
 
 {% elif paso == 3 %}
 <section class="card shadow-sm border-0">
-    <div class="card-body p-4">
+    <div class="card-body p-3 p-sm-4">
         <h3 class="h5 fw-bold">Paso 3. Confirmar entrega</h3>
         <div class="row g-3 my-2">
-            <div class="col-md-6"><span class="text-muted d-block">Alumno</span><strong>{{ alumno.get_full_name|default:alumno.boleta_credencial }}</strong></div>
-            <div class="col-md-6"><span class="text-muted d-block">Boleta</span><strong>{{ alumno.boleta_credencial }}</strong></div>
+            <div class="col-12 col-md-6"><span class="text-muted d-block">Alumno</span><strong>{{ alumno.get_full_name|default:alumno.boleta_credencial }}</strong></div>
+            <div class="col-12 col-md-6"><span class="text-muted d-block">Boleta</span><strong>{{ alumno.boleta_credencial }}</strong></div>
             {% if solicitud %}<div class="col-12"><span class="text-muted d-block">Solicitud</span><strong>{{ solicitud.folio }} · {{ solicitud.fecha|date:"d/m/Y" }} · {{ solicitud.bloque }}</strong></div>{% endif %}
         </div>
         <h4 class="h6 fw-bold border-bottom pb-2">Unidades seleccionadas</h4>
         <ul class="list-group list-group-flush mb-4">
             {% for unidad in seleccionadas %}
-            <li class="list-group-item px-0 d-flex justify-content-between gap-2">
+            <li class="list-group-item px-0 d-flex flex-wrap justify-content-between gap-2">
                 <span>{{ unidad.nombre }}</span><code>{{ unidad.id_unico }}</code>
             </li>
             {% empty %}
@@ -150,9 +170,11 @@
                 <input class="form-check-input" type="checkbox" id="acepto_reglamento" name="acepto_reglamento" required>
                 <label class="form-check-label" for="acepto_reglamento">Confirmo la entrega y que el alumno acepta el reglamento del laboratorio.</label>
             </div>
-            <div class="d-flex flex-wrap justify-content-between gap-2">
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
                 <a class="btn btn-outline-secondary" href="?paso=2">Volver a equipos</a>
-                <button type="submit" id="accionPrincipal" class="btn btn-guinda px-4">Confirmar préstamo (F2)</button>
+                <button type="submit" id="accionPrincipal" class="btn btn-guinda px-4">
+                    Confirmar préstamo <span class="d-none d-md-inline">(F2)</span>
+                </button>
             </div>
         </form>
     </div>
@@ -162,9 +184,11 @@
 <form method="post" id="formCancelar" class="mt-3">
     {% csrf_token %}
     <input type="hidden" name="accion" value="cancelar">
-    <button type="submit" class="btn btn-link text-danger px-0">Cancelar operación (Esc)</button>
+    <button type="submit" class="btn btn-link text-danger px-0">
+        Cancelar operación <span class="d-none d-md-inline">(Esc)</span>
+    </button>
 </form>
-<p class="small text-muted mt-2">Atajos: <kbd>F2</kbd> continuar o confirmar · <kbd>Esc</kbd> cancelar · <kbd>Ctrl+B</kbd> buscar.</p>
+<p class="small text-muted mt-2 d-none d-md-block">Atajos: <kbd>F2</kbd> continuar o confirmar · <kbd>Esc</kbd> cancelar · <kbd>Ctrl+B</kbd> buscar.</p>
 {% endblock %}
 
 {% block extra_js %}

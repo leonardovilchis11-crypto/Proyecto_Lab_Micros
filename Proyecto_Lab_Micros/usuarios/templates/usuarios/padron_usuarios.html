@@ -2,26 +2,56 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Padrón de Usuarios - Administrador</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-custom { background-color: #6a1b29; color: white; }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 15px;
+            }
+            .navbar-custom {
+                padding: 0.75rem 1rem !important;
+                gap: 0.5rem;
+            }
+            .navbar-custom .navbar-brand {
+                font-size: 1rem !important;
+                white-space: normal;
+            }
+            .navbar-custom .btn {
+                font-size: 0.85rem;
+                padding: 0.45rem 0.7rem;
+            }
+            .form-control,
+            .form-select,
+            .input-group .btn,
+            .container > .d-flex .btn {
+                font-size: 16px !important;
+                padding: 0.6rem 0.85rem !important;
+            }
+            .table-responsive table {
+                min-width: 620px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="bg-light">
     {% include "shared/brand_logos.html" %}
-    <nav class="navbar navbar-custom px-4 py-2">
+    <nav class="navbar navbar-custom flex-wrap justify-content-between align-items-center px-4 py-2">
         <span class="navbar-brand mb-0 h1 text-white">Panel de Administración - ESIME</span>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-2">
             <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">Panel Principal</a>
             <a href="{% url 'mi_cuenta' %}" class="btn btn-outline-light btn-sm">Regresar a Mi Cuenta</a>
         </div>
     </nav>
 
-    <div class="container mt-4 mb-5">
+    <div class="container px-3 mt-4 mb-5">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-            <h2 class="mb-0" style="color: #6a1b29;">Padrón General de Usuarios</h2>
-            <div class="d-flex flex-wrap gap-2">
+            <h2 class="h4 fw-bold mb-0" style="color: #6a1b29;">Padrón General de Usuarios</h2>
+            <div class="d-flex flex-column flex-sm-row gap-2">
                 <a href="{% url 'registro_alumno' %}" class="btn btn-outline-dark btn-sm">+ Registrar Alumno</a>
                 <a href="{% url 'registrar_personal' %}" class="btn text-white btn-sm" style="background-color: #6a1b29;">+ Alta de Personal</a>
             </div>
@@ -45,50 +75,54 @@
             {% endif %}
         </form>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered align-middle">
-                <thead class="table-dark" style="background-color: #6a1b29;">
-                    <tr>
-                        <th>Boleta / Credencial</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
-                        <th>Estatus</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in usuarios %}
-                    <tr>
-                        <td>{{ u.boleta_credencial }}</td>
-                        <td>{{ u.first_name }} {{ u.last_name }}</td>
-                        <td>{{ u.correo_institucional }}</td>
-                        <td>{{ u.get_rol_display }}</td>
-                        <td>
-                            <span class="badge {% if u.estatus == 'ACTIVO' %}bg-success{% elif u.estatus == 'SANCIONADO' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
-                                {{ u.get_estatus_display }}
-                            </span>
-                            {% if not u.is_active %}
-                                <span class="badge bg-secondary ms-1">Inactivo</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="d-flex flex-wrap gap-1">
-                                <a href="{% url 'editar_usuario' u.id %}" class="btn btn-warning btn-sm text-dark">Editar</a>
-                                <a href="{% url 'eliminar_usuario' u.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">Eliminar</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center">No se encontraron usuarios registrados.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle mb-0">
+                    <thead class="table-dark" style="background-color: #6a1b29;">
+                        <tr>
+                            <th>Boleta / Credencial</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estatus</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in usuarios %}
+                        <tr>
+                            <td>{{ u.boleta_credencial }}</td>
+                            <td>{{ u.first_name }} {{ u.last_name }}</td>
+                            <td>{{ u.correo_institucional }}</td>
+                            <td>{{ u.get_rol_display }}</td>
+                            <td>
+                                <span class="badge {% if u.estatus == 'ACTIVO' %}bg-success{% elif u.estatus == 'SANCIONADO' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                    {{ u.get_estatus_display }}
+                                </span>
+                                {% if not u.is_active %}
+                                    <span class="badge bg-secondary ms-1">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <a href="{% url 'editar_usuario' u.id %}" class="btn btn-warning btn-sm text-dark">Editar</a>
+                                    <a href="{% url 'eliminar_usuario' u.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">No se encontraron usuarios registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-{% include "shared/session_timeout.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% include "shared/session_timeout.html" %}
 </body>
 </html>
 

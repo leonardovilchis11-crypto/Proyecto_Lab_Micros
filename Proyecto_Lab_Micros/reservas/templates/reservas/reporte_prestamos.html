@@ -14,15 +14,15 @@
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label for="filtro_q" class="form-label fw-semibold">Buscar por matrícula, alumno, folio o equipo</label>
                 <input id="filtro_q" name="q" value="{{ query }}" class="form-control" placeholder="Ej. RES-1001 o 2022641234">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label for="filtro_fecha" class="form-label fw-semibold">Fecha de entrega o devolución</label>
                 <input id="filtro_fecha" type="date" name="fecha" value="{{ fecha_sel }}" class="form-control" lang="es-MX">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label for="filtro_estatus" class="form-label fw-semibold">Estatus</label>
                 <select id="filtro_estatus" name="estatus" class="form-select">
                     <option value="">Todos</option>
@@ -31,9 +31,9 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-12 col-md-2 d-flex flex-column flex-sm-row gap-2">
                 <button type="submit" class="btn btn-guinda w-100">Filtrar</button>
-                <a href="{% url 'reservas:reporte_prestamos' %}" class="btn btn-outline-secondary">Limpiar</a>
+                <a href="{% url 'reservas:reporte_prestamos' %}" class="btn btn-outline-secondary w-100">Limpiar</a>
             </div>
         </form>
     </div>
@@ -41,7 +41,7 @@
 
 <div class="card shadow-sm border-0">
     {% if not prestamos %}
-    <div class="text-center py-5">
+    <div class="text-center py-5 px-3">
         <p class="fs-5 fw-semibold text-muted mb-2">No hay préstamos registrados</p>
         <p class="text-muted mb-0">Prueba con otros filtros o registra una entrega desde ventanilla.</p>
     </div>
@@ -89,29 +89,28 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% if prestamos %}
-        <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <small class="text-muted">
-                Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ total_registros }} registros.
-            </small>
-            <nav aria-label="Paginación del historial de préstamos">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-                        {% if page_obj.has_previous %}
-                        <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
-                        {% else %}<span class="page-link">Anterior</span>{% endif %}
-                    </li>
-                    <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-                    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-                        {% if page_obj.has_next %}
-                        <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
-                        {% else %}<span class="page-link">Siguiente</span>{% endif %}
-                    </li>
-                </ul>
-            </nav>
-        </div>
-        {% endif %}
+    </div>
+    <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <small class="text-muted">
+            Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ total_registros }} registros.
+        </small>
+        <nav aria-label="Paginación del historial de préstamos">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                    {% if page_obj.has_previous %}
+                    <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                    {% else %}<span class="page-link">Anterior</span>{% endif %}
+                </li>
+                <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                    {% if page_obj.has_next %}
+                    <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                    {% else %}<span class="page-link">Siguiente</span>{% endif %}
+                </li>
+            </ul>
+        </nav>
     </div>
     {% endif %}
 </div>
 {% endblock %}
+
