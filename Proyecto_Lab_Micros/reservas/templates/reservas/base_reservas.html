@@ -126,7 +126,7 @@
                                href="{% url 'reservas:carrito' %}">
                                 Carrito
                                 <span class="badge bg-light text-dark ms-1">
-                                    {{ carrito_count|default:request.session.carrito_solicitud|length }}
+                                    {% if carrito_count is not None %}{{ carrito_count }}{% elif 'carrito_solicitud' in request.session %}{{ request.session.carrito_solicitud|length }}{% else %}0{% endif %}
                                 </span>
                             </a>
                         </li>
