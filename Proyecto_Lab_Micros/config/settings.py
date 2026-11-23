@@ -132,14 +132,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 
 # Database
-if os.environ.get('USE_SQLITE') == '1':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db_prod.sqlite3',
-        }
-    }
-else:
+if os.environ.get('USE_MYSQL') == '1':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -148,6 +141,13 @@ else:
             'PASSWORD': os.environ.get('DB_PASSWORD', '1234'),
             'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
             'PORT': os.environ.get('DB_PORT', '3306'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db_prod.sqlite3',
         }
     }
 
